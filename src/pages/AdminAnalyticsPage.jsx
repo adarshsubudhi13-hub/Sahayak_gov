@@ -73,7 +73,7 @@ export function AdminAnalyticsPage() {
       <div className="bg-gradient-to-r from-amber-600 to-amber-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
         <div className="flex items-center gap-2 text-xs text-amber-200 font-bold mb-1">
           <ShieldCheck className="w-4 h-4" />
-          Telangana e-Governance Analytics Dashboard
+          Universal e-Governance Analytics Dashboard (Pan-India)
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
           {t('adminTitle')}

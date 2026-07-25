@@ -1,39 +1,34 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { translations } from '../lib/i18n/translations.js';
+import React, { createContext, useContext, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import '../lib/i18n/i18n.js'; // Initialize i18next
 
 const LanguageContext = createContext();
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguageState] = useState('en');
+  const { t, i18n } = useTranslation();
 
+  // Dynamic DOM language mutation (from the a11y guide)
   useEffect(() => {
-    const saved = localStorage.getItem('sahayak_lang');
-    if (saved && (saved === 'en' || saved === 'hi' || saved === 'te')) {
-      setLanguageState(saved);
-    }
-  }, []);
+    document.documentElement.lang = i18n.resolvedLanguage || 'en';
+  }, [i18n.resolvedLanguage]);
 
   const setLanguage = (lang) => {
-    setLanguageState(lang);
+    i18n.changeLanguage(lang);
     localStorage.setItem('sahayak_lang', lang);
   };
 
-  const t = (key) => {
-    const dict = translations[language] || translations['en'];
-    return dict[key] || translations['en'][key] || String(key);
-  };
-
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
-      {children}
+    <LanguageContext.Provider value={{ language: i18n.resolvedLanguage || 'en', setLanguage, t }}>
+      {/* React Suspense handles the loading state while the JSON chunks download */}
+      <React.Suspense fallback={<div className="p-4 text-center">Loading language...</div>}>
+        {children}
+      </React.Suspense>
     </LanguageContext.Provider>
   );
 }
 
 export function useLanguage() {
   const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
+  if (!context) throw new Error('useLanguage must be used within a LanguageProvider');
   return context;
 }

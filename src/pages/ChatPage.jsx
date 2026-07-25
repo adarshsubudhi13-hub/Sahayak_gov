@@ -16,7 +16,7 @@ export function ChatPage() {
     {
       id: 'welcome-msg',
       query_text: 'Hello Sahayak!',
-      response_text: 'Greetings! I am your Sahayak AI assistant. Every answer I provide is strictly grounded in official Telangana government scheme clauses. How can I help you today?',
+      response_text: 'Greetings! I am your Sahayak AI assistant. Every answer I provide is strictly grounded in official Indian Central and State government scheme clauses. How can I help you today?',
       retrieved_source_ids: [],
       confidence_score: 0.95,
       was_low_confidence: false,
@@ -100,7 +100,7 @@ export function ChatPage() {
             <span className="text-gray-500 block text-[11px]">
               {selectedSchemeObj 
                 ? `Scoped to: ${selectedSchemeObj.name_en}`
-                : 'Searching all 15+ Telangana Schemes'}
+                : 'Searching all Central & State Schemes'}
             </span>
           </div>
         </div>
@@ -183,7 +183,7 @@ export function ChatPage() {
         {loading && (
           <div className="flex items-center gap-3 text-xs text-teal-700 font-semibold p-4 bg-teal-50/60 rounded-2xl animate-pulse">
             <Sparkles className="w-4 h-4 text-amber-500 animate-spin" />
-            Retrieving official Telangana government scheme clauses...
+            Retrieving official Central and State government scheme clauses...
           </div>
         )}
 

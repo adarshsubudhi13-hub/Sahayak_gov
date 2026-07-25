@@ -1,52 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { ShieldCheck, ArrowRight, Lock, User, MapPin, Briefcase, GraduationCap, Users } from 'lucide-react';
-
-const TELANGANA_DISTRICTS = [
-  'Adilabad', 'Bhadradri Kothagudem', 'Hyderabad', 'Jagtial', 'Jangaon', 
-  'Jayashankar Bhupalpally', 'Jogulamba Gadwal', 'Kamareddy', 'Karimnagar', 
-  'Khammam', 'Komaram Bheem Asifabad', 'Mahabubabad', 'Mahabubnagar', 
-  'Mancherial', 'Medak', 'Medchal-Malkajgiri', 'Mulugu', 'Nalgonda', 
-  'Narayanpet', 'Nirmal', 'Nizamabad', 'Peddapalli', 'Rajanna Sircilla', 
-  'Ranga Reddy', 'Sangareddy', 'Siddipet', 'Suryapet', 'Vikarabad', 
-  'Wanaparthy', 'Warangal', 'Hanamkonda', 'Yadadri Bhuvanagiri'
-];
+import { ShieldCheck, ArrowRight, Lock, Loader2 } from 'lucide-react';
+import { fetchDemographicFields } from '../lib/api.js';
 
 export function ProfilePage() {
   const navigate = useNavigate();
   const { language, t } = useLanguage();
 
-  const [profile, setProfile] = useState({
-    id: 'demo-user-1',
-    role: 'citizen',
-    full_name: 'Rani Kumari',
-    age: 20,
-    gender: 'female',
-    state: 'Telangana',
-    district: 'Warangal',
-    occupation: 'Student',
-    annual_income_band: '1L_2L',
-    education_level: 'Undergraduate (BA/BSc/BCom/BTech)',
-    social_category: 'SC',
-    disability_status: false,
-    preferred_language: language
-  });
+  const [profile, setProfile] = useState({});
+  const [fields, setFields] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem('sahayak_user_profile');
-    if (saved) {
+    async function loadFields() {
       try {
-        setProfile(JSON.parse(saved));
-      } catch (e) {}
+        const response = await fetchDemographicFields();
+        setFields(response.data.fields);
+        
+        // Initialize profile state based on fetched fields
+        const initialProfile = { id: 'demo-user-1', role: 'citizen', preferred_language: language };
+        response.data.fields.forEach(f => {
+          initialProfile[f.field_key] = f.data_type === 'number' ? '' : (f.data_type === 'boolean' ? false : '');
+        });
+
+        // Merge with any saved profile
+        const saved = localStorage.getItem('sahayak_user_profile');
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            Object.assign(initialProfile, parsed);
+          } catch (e) {}
+        }
+        
+        setProfile(initialProfile);
+      } catch (error) {
+        console.error("Error loading demographic fields:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  }, []);
+    loadFields();
+  }, [language]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     localStorage.setItem('sahayak_user_profile', JSON.stringify(profile));
     navigate('/schemes');
   };
+
+  const getLabel = (field) => {
+    return field.translations?.[language]?.label || field.label_default;
+  };
+
+  const getOptionLabel = (option) => {
+    return option.translations?.[language] || option.translations?.en || option.value;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-teal-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 max-w-3xl w-full mx-auto py-10 px-4 sm:px-6">
@@ -55,7 +72,7 @@ export function ProfilePage() {
         <div className="border-b border-gray-100 pb-6 space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-semibold border border-teal-200">
             <ShieldCheck className="w-4 h-4 text-teal-600" />
-            Step 1 of 2 • Deterministic Eligibility Calculation
+            Step 1 of 2 • Dynamic Profile Generation
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             {t('profileTitle')}
@@ -66,161 +83,60 @@ export function ProfilePage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-gray-400" />
-                {t('fullNameLabel')}
-              </label>
+            {fields.map(field => {
+              if (field.data_type === 'boolean') return null; // Render checkboxes at the bottom
+              
+              return (
+                <div key={field.field_key}>
+                  <label htmlFor={field.field_key} className="block text-xs font-semibold text-gray-700 mb-1">
+                    {getLabel(field)}
+                  </label>
+                  
+                  {field.data_type === 'enum' && field.options ? (
+                    <select
+                      id={field.field_key}
+                      required={field.is_required}
+                      value={profile[field.field_key] || ''}
+                      onChange={e => setProfile({ ...profile, [field.field_key]: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-teal-600 outline-none bg-white"
+                    >
+                      <option value="">Select an option...</option>
+                      {field.options.map(opt => (
+                        <option key={opt.value} value={opt.value}>
+                          {getOptionLabel(opt)}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      id={field.field_key}
+                      type={field.data_type === 'number' ? 'number' : 'text'}
+                      required={field.is_required}
+                      value={profile[field.field_key] || ''}
+                      onChange={e => setProfile({ ...profile, [field.field_key]: field.data_type === 'number' ? Number(e.target.value) : e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-teal-600 outline-none"
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {fields.filter(f => f.data_type === 'boolean').map(field => (
+            <div key={field.field_key} className="flex items-center gap-3 pt-2">
               <input
-                type="text"
-                required
-                value={profile.full_name}
-                onChange={e => setProfile({ ...profile, full_name: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-teal-600 outline-none"
+                type="checkbox"
+                id={field.field_key}
+                checked={!!profile[field.field_key]}
+                onChange={e => setProfile({ ...profile, [field.field_key]: e.target.checked })}
+                className="w-4 h-4 text-teal-700 border-gray-300 rounded focus:ring-teal-600"
               />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                {t('ageLabel')}
+              <label htmlFor={field.field_key} className="text-xs font-medium text-gray-700 cursor-pointer">
+                {getLabel(field)}
               </label>
-              <input
-                type="number"
-                required
-                min={1}
-                max={120}
-                value={profile.age}
-                onChange={e => setProfile({ ...profile, age: Number(e.target.value) })}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-teal-600 outline-none"
-              />
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                {t('genderLabel')}
-              </label>
-              <select
-                value={profile.gender}
-                onChange={e => setProfile({ ...profile, gender: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-teal-600 outline-none bg-white"
-              >
-                <option value="female">Female</option>
-                <option value="male">Male</option>
-                <option value="other">Other / Transgender</option>
-                <option value="prefer_not_to_say">Prefer not to say</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                {t('districtLabel')} (Telangana)
-              </label>
-              <select
-                value={profile.district}
-                onChange={e => setProfile({ ...profile, district: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-teal-600 outline-none bg-white"
-              >
-                {TELANGANA_DISTRICTS.map(d => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
-                <Briefcase className="w-3.5 h-3.5 text-gray-400" />
-                {t('occupationLabel')}
-              </label>
-              <select
-                value={profile.occupation}
-                onChange={e => setProfile({ ...profile, occupation: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-teal-600 outline-none bg-white"
-              >
-                <option value="Student">Student</option>
-                <option value="Farmer / Agriculturist">Farmer / Agriculturist</option>
-                <option value="Agricultural Worker / Tenant Farmer">Agricultural Worker / Tenant Farmer</option>
-                <option value="Unemployed Youth">Unemployed Youth</option>
-                <option value="Self-Employed / Artisan">Self-Employed / Artisan</option>
-                <option value="Private Sector Employee">Private Sector Employee</option>
-                <option value="Government Employee">Government Employee</option>
-                <option value="Homemaker">Homemaker</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                {t('incomeBandLabel')}
-              </label>
-              <select
-                value={profile.annual_income_band}
-                onChange={e => setProfile({ ...profile, annual_income_band: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-teal-600 outline-none bg-white"
-              >
-                <option value="below_1L">{t('below_1L')}</option>
-                <option value="1L_2L">{t('1L_2L')}</option>
-                <option value="2L_5L">{t('2L_5L')}</option>
-                <option value="above_5L">{t('above_5L')}</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
-                <GraduationCap className="w-3.5 h-3.5 text-gray-400" />
-                {t('educationLabel')}
-              </label>
-              <select
-                value={profile.education_level}
-                onChange={e => setProfile({ ...profile, education_level: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-teal-600 outline-none bg-white"
-              >
-                <option value="10th Pass or below">10th Pass or below</option>
-                <option value="Intermediate">Intermediate (10+2)</option>
-                <option value="Diploma / ITI">Diploma / ITI</option>
-                <option value="Undergraduate (BA/BSc/BCom/BTech)">Undergraduate (BA/BSc/BCom/BTech)</option>
-                <option value="Postgraduate (MA/MSc/MBA/MTech)">Postgraduate (MA/MSc/MBA/MTech)</option>
-                <option value="Doctorate / PhD">Doctorate / PhD</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-gray-400" />
-                {t('socialCategoryLabel')}
-              </label>
-              <select
-                value={profile.social_category}
-                onChange={e => setProfile({ ...profile, social_category: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-teal-600 outline-none bg-white"
-              >
-                <option value="SC">SC (Scheduled Caste)</option>
-                <option value="ST">ST (Scheduled Tribe)</option>
-                <option value="OBC">OBC / BC (Backward Class)</option>
-                <option value="General">General / EBC</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 pt-2">
-            <input
-              type="checkbox"
-              id="pwd"
-              checked={profile.disability_status}
-              onChange={e => setProfile({ ...profile, disability_status: e.target.checked })}
-              className="w-4 h-4 text-teal-700 border-gray-300 rounded focus:ring-teal-600"
-            />
-            <label htmlFor="pwd" className="text-xs font-medium text-gray-700 cursor-pointer">
-              {t('disabilityLabel')}
-            </label>
-          </div>
+          ))}
 
           <div className="pt-6 border-t border-gray-100">
             <button

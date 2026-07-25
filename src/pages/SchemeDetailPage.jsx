@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { TELANGANA_SCHEMES } from '../lib/seed/telanganaSchemes.js';
+import { fetchSchemesAndRules } from '../lib/api.js';
 import { 
   Building2, Calendar, Clock, ExternalLink, 
-  FileText, MessageSquare, ArrowLeft, BookmarkPlus, Sparkles 
+  FileText, MessageSquare, ArrowLeft, BookmarkPlus, Sparkles, Loader2 
 } from 'lucide-react';
 
 export function SchemeDetailPage() {
@@ -12,35 +12,55 @@ export function SchemeDetailPage() {
   const { language, t } = useLanguage();
   const [scheme, setScheme] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const found = TELANGANA_SCHEMES.find(s => s.id === id);
-    if (found) {
-      setScheme(found);
-    }
-
-    const saved = localStorage.getItem('sahayak_saved_schemes');
-    if (saved) {
+    async function loadScheme() {
       try {
-        const list = JSON.parse(saved);
-        if (id && list.includes(id)) {
-          setIsSaved(true);
+        const response = await fetchSchemesAndRules();
+        const found = response.data.schemes.find(s => s.id === id);
+        if (found) {
+          setScheme(found);
         }
-      } catch (e) {}
+
+        const saved = localStorage.getItem('sahayak_saved_schemes');
+        if (saved) {
+          try {
+            const list = JSON.parse(saved);
+            if (id && list.includes(id)) {
+              setIsSaved(true);
+            }
+          } catch (e) {}
+        }
+      } catch (error) {
+        console.error("Error loading scheme:", error);
+      } finally {
+        setLoading(false);
+      }
     }
+    loadScheme();
   }, [id]);
 
-  if (!scheme) {
+  if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-6 text-center">
-        <p className="text-sm text-gray-500">Loading scheme details...</p>
+      <div className="flex-1 flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-teal-600" />
       </div>
     );
   }
 
-  const schemeName = language === 'hi' ? scheme.name_hi : language === 'te' ? scheme.name_te : scheme.name_en;
-  const description = language === 'hi' ? scheme.description_hi : language === 'te' ? scheme.description_te : scheme.description_en;
-  const benefits = language === 'hi' ? scheme.benefits_hi : language === 'te' ? scheme.benefits_te : scheme.benefits_en;
+  if (!scheme) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-6 text-center">
+        <p className="text-sm text-gray-500">Scheme not found.</p>
+      </div>
+    );
+  }
+
+  const schemeName = scheme.translations?.[language]?.name || scheme.name_default;
+  const description = scheme.translations?.[language]?.description || scheme.description_default;
+  // Fallback for missing benefits in mock payload
+  const benefits = scheme.translations?.[language]?.description || scheme.description_default;
 
   const toggleSave = () => {
     const saved = localStorage.getItem('sahayak_saved_schemes');
@@ -85,7 +105,7 @@ export function SchemeDetailPage() {
 
         <p className="text-xs font-semibold text-gray-500 flex items-center gap-2">
           <Building2 className="w-4 h-4 text-teal-600" />
-          {t('issuingDept')} <span className="text-gray-900 font-bold">{scheme.issuing_department}</span>
+          {t('issuingDept')} <span className="text-gray-900 font-bold">{scheme.department}</span>
         </p>
 
         <p className="text-sm text-gray-700 leading-relaxed pt-2 border-t border-gray-100">
@@ -136,12 +156,6 @@ export function SchemeDetailPage() {
           <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 text-xs font-medium text-amber-950 leading-relaxed">
             {benefits}
           </div>
-          {scheme.deadline && (
-            <p className="text-xs text-gray-500 flex items-center gap-1.5 font-semibold pt-2">
-              <Calendar className="w-4 h-4 text-gray-400" />
-              {t('deadlineHeader')}: <span className="text-gray-900 font-bold">{scheme.deadline}</span>
-            </p>
-          )}
         </div>
 
         <div className="bg-white rounded-3xl border border-gray-200 p-6 space-y-4 shadow-sm">
@@ -151,10 +165,9 @@ export function SchemeDetailPage() {
           </h2>
           <ul className="space-y-3">
             {scheme.required_documents.map(doc => {
-              const docName = language === 'hi' ? doc.name_hi : language === 'te' ? doc.name_te : doc.name_en;
-              const helper = language === 'hi' ? doc.helper_text_hi : language === 'te' ? doc.helper_text_te : doc.helper_text_en;
+              const docName = doc.translations?.[language]?.name || doc.translations?.en?.name;
               return (
-                <li key={doc.key} className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
+                <li key={doc.key_name} className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
                   <p className="text-xs font-bold text-gray-900 flex items-center justify-between">
                     <span>{docName}</span>
                     {doc.issuing_authority && (
@@ -163,9 +176,6 @@ export function SchemeDetailPage() {
                       </span>
                     )}
                   </p>
-                  {helper && (
-                    <p className="text-[11px] text-gray-500 leading-snug">{helper}</p>
-                  )}
                 </li>
               );
             })}
