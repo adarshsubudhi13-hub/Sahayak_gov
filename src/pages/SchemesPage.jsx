@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { SchemeCard } from '../components/SchemeCard.jsx';
 import { matchProfileAgainstSchemes } from '../lib/engine/eligibilityMatcher.js';
-import { Filter, Sparkles, UserCheck, MessageSquare } from 'lucide-react';
+import { fetchSchemesAndRules } from '../lib/api.js';
+import { Filter, Sparkles, UserCheck, MessageSquare, Loader2 } from 'lucide-react';
 
 export function SchemesPage() {
   const { t } = useLanguage();
@@ -11,41 +12,55 @@ export function SchemesPage() {
   const [matches, setMatches] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [savedSchemeIds, setSavedSchemeIds] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let currentProfile = {
-      id: 'demo-user-1',
-      role: 'citizen',
-      full_name: 'Rani Kumari',
-      age: 20,
-      gender: 'female',
-      state: 'Telangana',
-      district: 'Warangal',
-      occupation: 'Student',
-      annual_income_band: '1L_2L',
-      education_level: 'Undergraduate (BA/BSc/BCom/BTech)',
-      social_category: 'SC',
-      disability_status: false,
-      preferred_language: 'en'
-    };
-
-    const savedProf = localStorage.getItem('sahayak_user_profile');
-    if (savedProf) {
+    async function loadData() {
       try {
-        currentProfile = JSON.parse(savedProf);
-      } catch (e) {}
-    }
-    setProfile(currentProfile);
+        let currentProfile = {
+          id: 'demo-user-1',
+          role: 'citizen',
+          full_name: 'Rani Kumari',
+          age: 20,
+          gender: 'female',
+          state: 'Telangana',
+          district: 'Warangal',
+          occupation: 'Student',
+          annual_income_band: '1L_2L',
+          education_level: 'Undergraduate (BA/BSc/BCom/BTech)',
+          social_category: 'SC',
+          disability_status: false,
+          preferred_language: 'en'
+        };
 
-    const results = matchProfileAgainstSchemes(currentProfile);
-    setMatches(results);
+        const savedProf = localStorage.getItem('sahayak_user_profile');
+        if (savedProf) {
+          try {
+            currentProfile = JSON.parse(savedProf);
+          } catch (e) {}
+        }
+        setProfile(currentProfile);
 
-    const savedList = localStorage.getItem('sahayak_saved_schemes');
-    if (savedList) {
-      try {
-        setSavedSchemeIds(JSON.parse(savedList));
-      } catch (e) {}
+        // Fetch schemes from simulated API
+        const response = await fetchSchemesAndRules();
+        const schemesFromApi = response.data.schemes;
+
+        const results = matchProfileAgainstSchemes(currentProfile, schemesFromApi);
+        setMatches(results);
+
+        const savedList = localStorage.getItem('sahayak_saved_schemes');
+        if (savedList) {
+          try {
+            setSavedSchemeIds(JSON.parse(savedList));
+          } catch (e) {}
+        }
+      } catch (error) {
+        console.error("Error loading schemes:", error);
+      } finally {
+        setLoading(false);
+      }
     }
+    loadData();
   }, []);
 
   const handleSaveScheme = (schemeId) => {
@@ -58,6 +73,14 @@ export function SchemesPage() {
     setSavedSchemeIds(updated);
     localStorage.setItem('sahayak_saved_schemes', JSON.stringify(updated));
   };
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-teal-600" />
+      </div>
+    );
+  }
 
   const eligibleMatches = matches.filter(m => m.is_eligible);
   const filteredMatches = selectedCategory === 'all' 
@@ -89,7 +112,7 @@ export function SchemesPage() {
               {t('matchedSchemesTitle')} ({eligibleMatches.length} Schemes Matched)
             </h2>
             <p className="text-xs text-teal-100/80">
-              {profile.district} • Income: {profile.annual_income_band.replace('_', '-')} • Category: {profile.social_category} • {profile.occupation}
+              {profile.district} • Category: {profile.social_category} • {profile.occupation}
             </p>
           </div>
 

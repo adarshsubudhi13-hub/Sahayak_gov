@@ -1,7 +1,5 @@
-import { TELANGANA_SCHEMES, TELANGANA_ELIGIBILITY_RULES } from '../seed/telanganaSchemes.js';
-
 export function evaluateRule(rule, profile) {
-  const profileVal = profile[rule.field];
+  const profileVal = profile[rule.field_key];
 
   if (profileVal === undefined || profileVal === null) {
     return false;
@@ -36,20 +34,19 @@ export function evaluateRule(rule, profile) {
 
 export function matchProfileAgainstSchemes(
   profile,
-  schemes = TELANGANA_SCHEMES,
-  rules = TELANGANA_ELIGIBILITY_RULES
+  schemes = []
 ) {
   return schemes.map(scheme => {
-    const schemeRules = rules.filter(r => r.scheme_id === scheme.id);
+    const schemeRules = scheme.rules || [];
 
     if (schemeRules.length === 0) {
       return {
         scheme,
         is_eligible: true,
         match_reasons: {
-          en: ['Open to all residents of Telangana.'],
-          hi: ['तेलंगाना के सभी निवासियों के लिए खुला है।'],
-          te: ['తెలంగాణ పౌరులందరికీ అందుబాటులో ఉంది.']
+          en: ['Open to all residents.'],
+          hi: ['सभी निवासियों के लिए खुला है।'],
+          te: ['పౌరులందరికీ అందుబాటులో ఉంది.']
         },
         passed_rules_count: 1,
         total_rules_count: 1
@@ -64,21 +61,21 @@ export function matchProfileAgainstSchemes(
     for (const rule of schemeRules) {
       if (evaluateRule(rule, profile)) {
         passedCount++;
-        passedReasonsEn.push(rule.match_reason_en);
-        passedReasonsHi.push(rule.match_reason_hi);
-        passedReasonsTe.push(rule.match_reason_te);
+        passedReasonsEn.push(rule.match_reason_default);
+        passedReasonsHi.push(rule.translations?.hi?.match_reason || rule.match_reason_default);
+        passedReasonsTe.push(rule.translations?.te?.match_reason || rule.match_reason_default);
       }
     }
 
-    const isEligible = passedCount > 0;
+    const isEligible = passedCount > 0 && passedCount >= schemeRules.filter(r => r.is_mandatory).length;
 
     return {
       scheme,
       is_eligible: isEligible,
       match_reasons: {
-        en: passedReasonsEn.length > 0 ? passedReasonsEn : ['Meets basic Telangana residency criteria.'],
-        hi: passedReasonsHi.length > 0 ? passedReasonsHi : ['बुनियादी तेलंगाना निवास मानदंडों को पूरा करता है।'],
-        te: passedReasonsTe.length > 0 ? passedReasonsTe : ['తెలంగాణ స్థానికత సూత్రాలకు కట్టుబడి ఉంది.']
+        en: passedReasonsEn.length > 0 ? passedReasonsEn : ['Meets basic criteria.'],
+        hi: passedReasonsHi.length > 0 ? passedReasonsHi : ['बुनियादी मानदंडों को पूरा करता है।'],
+        te: passedReasonsTe.length > 0 ? passedReasonsTe : ['ప్రాథమిక సూత్రాలకు కట్టుబడి ఉంది.']
       },
       passed_rules_count: passedCount,
       total_rules_count: schemeRules.length

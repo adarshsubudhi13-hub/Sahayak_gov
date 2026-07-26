@@ -13,8 +13,8 @@ export function LandingPage() {
         <div className="max-w-5xl mx-auto text-center relative z-10 space-y-6">
           
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-800/80 border border-teal-600/50 text-teal-200 text-xs font-semibold backdrop-blur">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            Source-Grounded Government Welfare Guide • Telangana State
+            <Sparkles className="w-4 h-4 text-amber-500" />
+            Source-Grounded Government Welfare Guide • Pan-India Platform
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight max-w-4xl mx-auto">
@@ -106,7 +106,7 @@ export function LandingPage() {
               to="/schemes"
               className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow transition-all"
             >
-              Browse Telangana Schemes (15+ Seeded)
+              Browse Central & State Schemes (50+ Supported)
             </Link>
             <Link
               to="/chat"
