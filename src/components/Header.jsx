@@ -22,7 +22,7 @@ export function Header({ currentRole = 'citizen', onRoleToggle }) {
               <span className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-1.5">
                 {t('appName')}
                 <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 font-semibold">
-                  Telangana
+                  India
                 </span>
               </span>
               <p className="text-[11px] text-gray-500 hidden sm:block">
