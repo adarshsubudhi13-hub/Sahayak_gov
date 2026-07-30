@@ -1,4 +1,0 @@
-@echo off
-git add -A
-git commit -m "chore: final cleanup of temp scripts"
-git push origin main
