@@ -137,3 +137,30 @@ export const AP_ELIGIBILITY_RULES = [
     match_reason_te: 'రైతులకు వ్యవసాయ రాయితీ.'
   }
 ];
+
+export const AP_RAG_DOCUMENTS = [
+  {
+    id: 'doc-ap-ysrcp-housing-clause-1',
+    scheme_id: 'ap-ysr-housing',
+    clause_label: 'YSR Housing Scheme — House Site & Construction Assistance',
+    content: 'YSR Housing Scheme provides 1.5 cents of house site and ₹1,80,000 financial assistance for house construction to houseless BPL families in Andhra Pradesh. Beneficiaries are selected through a village-level survey. The amount is released in three installments through PFMS. No middlemen fees or bribes are permissible; the scheme is entirely paperless through Navasakam portal.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-ap-ysrcp-pension-clause-1',
+    scheme_id: 'ap-ysr-pension-kanuka',
+    clause_label: 'YSR Pension Kanuka — Enhanced Rates & Eligible Categories',
+    content: 'YSR Pension Kanuka provides enhanced monthly pensions: Old Age ₹3,000, Widow ₹3,000, Disability ₹3,000, Toddy Tappers ₹3,000, Traditional Cobblers ₹3,000, Weavers ₹3,000, and AIDS ₹5,000 per month. Pensions are delivered door-to-door by Volunteers on the first day of every month. Aadhaar-linked bank account is mandatory.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-ap-fee-reimbursement-clause-1',
+    scheme_id: 'ap-fee-reimbursement',
+    clause_label: 'AP Fee Reimbursement — Income Ceiling & Eligible Courses',
+    content: 'Andhra Pradesh Fee Reimbursement scheme covers tuition fee for SC, ST, BC, EBC, and Kapu students in recognized professional courses (Engineering, Medicine, Pharmacy, MBA, MCA, etc.). Income ceiling is ₹2,50,000 per annum for BC/EBC/Kapu and no income limit for SC/ST. Applications are submitted through APOSS portal with bonafide certificate, income certificate, and caste certificate.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];

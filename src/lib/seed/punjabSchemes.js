@@ -137,3 +137,30 @@ export const PUNJAB_ELIGIBILITY_RULES = [
     match_reason_pa: 'છોકરીઓ માટે લગ્ન અનુદાન.'
   }
 ];
+
+export const PUNJAB_RAG_DOCUMENTS = [
+  {
+    id: 'doc-pb-atta-dal-clause-1',
+    scheme_id: 'pb-atta-dal',
+    clause_label: 'Punjab Atta Dal Scheme — Entitlement Quantities & Blue Card Criteria',
+    content: 'Punjab Atta Dal scheme provides 5 kg atta (wheat flour) free per person per month and 1 kg dal at subsidised rates to Blue Card holders below the poverty line. Blue Cards are issued to families with monthly income below ₹15,000. Distribution is through designated fair price shops. Annual renewal of Blue Card is required through the District Food and Supply Controller office.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-pb-scholarship-clause-1',
+    scheme_id: 'pb-post-matric-scholarship',
+    clause_label: 'Punjab SC Post-Matric Scholarship — NSP Portal Application & Documents',
+    content: 'SC students domiciled in Punjab with family income below ₹2,50,000 per annum pursuing post-matric courses are eligible for tuition fee reimbursement and maintenance allowance under the National Scholarship Portal scheme. Fresh applications must be submitted on NSP portal (scholarships.gov.in) before October 31 of the academic year with institution and income verification.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-pb-ashirwad-clause-1',
+    scheme_id: 'pb-ashirwad',
+    clause_label: 'Ashirwad Scheme — ₹51,000 Marriage Grant Eligibility & Process',
+    content: 'Punjab Ashirwad Scheme provides ₹51,000 for marriage of daughters belonging to SC families with annual income not exceeding ₹32,790 (below poverty line income limit). Applicants apply through Sewa Kendra or online portal at least 15 days before the marriage date. Girl must be minimum 18 years old and boy minimum 21 years. Documents include BPL certificate, caste certificate, age proof, and marriage invitation.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];

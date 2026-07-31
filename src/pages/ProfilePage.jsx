@@ -122,6 +122,12 @@ export function ProfilePage() {
             <ShieldCheck className="w-4 h-4 text-teal-600" />
             Step 1 of 2 • Deterministic Eligibility Calculation
           </div>
+
+          {/* Progress bar */}
+          <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+            <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-teal-500 to-emerald-500" />
+          </div>
+
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             {t('profileTitle')}
           </h1>

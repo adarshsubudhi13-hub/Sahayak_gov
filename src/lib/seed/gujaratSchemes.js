@@ -148,3 +148,30 @@ export const GUJARAT_ELIGIBILITY_RULES = [
     match_reason_gu: 'વિદ્યાર્થીનીઓ માટે લક્ષિત શિષ્યવૃત્તિ.'
   }
 ];
+
+export const GUJARAT_RAG_DOCUMENTS = [
+  {
+    id: 'doc-gj-ikhedut-clause-1',
+    scheme_id: 'gj-ikhedut',
+    clause_label: 'i-Khedut Portal — Subsidy Application Process & Eligible Equipment',
+    content: 'Gujarat i-Khedut portal provides subsidies on agricultural inputs including tractors (25-35% subsidy), power tillers, sprinkler sets, drip irrigation systems, and farm mechanization equipment. Applicants must register on the portal (ikhedut.gujarat.gov.in) with their 7/12 land records. Applications are processed on first-come-first-served basis within the notified budget for each scheme component.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-gj-kisan-vikas-clause-1',
+    scheme_id: 'gj-mukhyamantri-kisan',
+    clause_label: 'Gujarat Mukhyamantri Kisan Sahay Yojana — Crop Loss Compensation Rules',
+    content: 'Mukhyamantri Kisan Sahay Yojana provides compensation for crop losses of 33% to 60% at ₹20,000 per hectare (up to 4 hectares) and for losses above 60% at ₹25,000 per hectare (up to 4 hectares). No premium is charged to farmers. Loss assessment is done by government survey teams after natural calamities (drought, flood, unseasonal rain). Aadhaar-linked bank account required for DBT.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-gj-viklang-clause-1',
+    scheme_id: 'gj-viklang-sahay',
+    clause_label: 'Gujarat Viklang Sahay — Disability Pension Eligibility & Amount',
+    content: 'Persons with 40% or more certified disability domiciled in Gujarat are eligible for Viklang Sahay pension of ₹600 per month. Persons with 80% or more disability receive enhanced pension of ₹1,000 per month. Applications submitted through the Directorate of Social Defence offices. Disability certificate from Civil Surgeon or authorized medical board is mandatory.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];

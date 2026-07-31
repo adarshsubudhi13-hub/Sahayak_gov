@@ -323,3 +323,30 @@ export const MAHARASHTRA_ELIGIBILITY_RULES = [
     match_reason_mr: 'EWS/सामान्य उमेदवार अण्णासाहेब पाटील कर्जासाठी पात्र ठरू शकतात.'
   }
 ];
+
+export const MAHARASHTRA_RAG_DOCUMENTS = [
+  {
+    id: 'doc-mh-scholarship-clause-1',
+    scheme_id: 'mh-mahatma-jyotirao-phule-scholarship',
+    clause_label: 'Maharashtra DBT Portal — SC/ST Post-Matric Scholarship Eligibility',
+    content: 'SC/ST students domiciled in Maharashtra pursuing post-matriculation courses in recognized institutions are eligible for fee reimbursement of compulsory non-refundable fees and maintenance allowance. Family annual income must not exceed ₹2,50,000 for SC and ₹2,50,000 for ST candidates. Applications must be submitted on MahaDBT portal before the notified deadline.',
+    language: 'en',
+    last_verified_at: '2026-07-01'
+  },
+  {
+    id: 'doc-mh-scholarship-clause-2',
+    scheme_id: 'mh-mahatma-jyotirao-phule-scholarship',
+    clause_label: 'Maharashtra Scholarship — Mandatory Caste Validity Certificate',
+    content: 'Caste Validity Certificate issued by the Scrutiny Committee is mandatory for SC/ST students applying under the scholarship scheme on MahaDBT. Students must submit fresh income certificate from Tahsildar for each academic year. Gap in study without genuine reason may lead to rejection of scholarship application.',
+    language: 'en',
+    last_verified_at: '2026-07-01'
+  },
+  {
+    id: 'doc-mh-udyogmitra-clause-1',
+    scheme_id: 'mh-balasaheb-thackeray-udyogmitra',
+    clause_label: 'Udyogmitra Scheme — Youth Enterprise Assistance & Eligibility',
+    content: 'Maharashtra Udyogmitra provides single-window assistance for youth entrepreneurs aged 18 to 45. Applicants must present a viable business plan. Subsidized loans up to ₹10 lakh are available under partnership with Maharashtra State Financial Corporation. Priority is given to SC/ST/OBC and women entrepreneurs.',
+    language: 'en',
+    last_verified_at: '2026-07-01'
+  }
+];

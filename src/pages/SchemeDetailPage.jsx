@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 import { useStateContext } from '../context/StateContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { logTelemetryEvent } from '../lib/supabase/db.js';
+import { VerifiedBadge } from '../components/VerifiedBadge.jsx';
 import {
   Building2, Calendar, Clock, ExternalLink,
   FileText, MessageSquare, ArrowLeft, BookmarkPlus, Sparkles, MapPin,
@@ -116,6 +117,7 @@ export function SchemeDetailPage() {
               <Clock className="w-4 h-4 text-blue-600" />
               {t('verifiedOn')} {scheme.last_verified_at}
             </span>
+            <VerifiedBadge date={scheme.last_verified_at} />
             {scheme.deadline && (
               <span className="flex items-center gap-1.5 text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
                 <Calendar className="w-4 h-4 text-amber-600" />

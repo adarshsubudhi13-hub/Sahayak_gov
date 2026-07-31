@@ -195,3 +195,30 @@ export const KERALA_ELIGIBILITY_RULES = [
     match_reason_ml: '18 വയസ്സിന് താഴെയുള്ള അനാഥരായ കുട്ടികൾക്ക് അർഹതയുണ്ട്.'
   }
 ];
+
+export const KERALA_RAG_DOCUMENTS = [
+  {
+    id: 'doc-kl-kudumbashree-clause-1',
+    scheme_id: 'kl-kudumbashree',
+    clause_label: 'Kudumbashree — SHG Formation & Micro-Credit Access Rules',
+    content: 'Kudumbashree operates through three-tier community structures: Neighbourhood Groups (NHGs) of 10-20 women, Area Development Societies (ADS), and Community Development Societies (CDS). Women in BPL families as identified through Nine Point Risk Index are primary members. NHGs are eligible for revolving fund assistance and linkage to bank credit up to ₹5 lakh for micro-enterprises.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-kl-scholarship-clause-1',
+    scheme_id: 'kl-scholarship-sc-st',
+    clause_label: 'Kerala eGrantz — SC/ST Scholarship Income Limit & Application Process',
+    content: 'SC students with family income up to ₹6 lakh per annum and ST students without any income ceiling are eligible for post-matric scholarship in Kerala. Applications are submitted through the eGrantz portal. Fresh income certificate from Village Officer, community certificate, and institutional enrollment certificate are mandatory documents.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-kl-pension-clause-1',
+    scheme_id: 'kl-karshaka-pension',
+    clause_label: 'Kerala Karshaka Pension — Eligibility Age, Land Holding & Income Criteria',
+    content: 'Farmers aged 60 years and above with land holding not exceeding 2 hectares are eligible for Kerala Karshaka Pension of ₹1,500 per month. The applicant must be primarily dependent on agriculture for livelihood and should not be receiving any other government pension. Applications are processed through the Akshaya centres or Agriculture Department offices.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];

@@ -127,3 +127,30 @@ export const ASSAM_ELIGIBILITY_RULES = [
     match_reason_as: 'পৰিয়ালৰ প্ৰাথমিক মহিলা সদস্যলৈ আৰ্থিক সাহায্য প্ৰদান কৰা হয়।'
   }
 ];
+
+export const ASSAM_RAG_DOCUMENTS = [
+  {
+    id: 'doc-as-orunodoi-clause-1',
+    scheme_id: 'as-orunodoi',
+    clause_label: 'Orunodoi Scheme — Monthly DBT Amount & Eligibility for Women',
+    content: 'Orunodoi Scheme provides ₹1,250 per month direct bank transfer to the woman member (or senior woman head) of eligible BPL families in Assam. Families with annual income below ₹2,00,000 not covered under any regular government employment are eligible. The scheme also provides ₹2,000 per month under Orunodoi 2.0 for prioritised below-poverty households. Registration through Gram Panchayat or Gaon Panchayat office.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-as-scholarship-clause-1',
+    scheme_id: 'as-schemss-scholarship',
+    clause_label: 'Assam Schemss Scholarship — Pre-Matric & Post-Matric Rates',
+    content: 'Pre-Matric Scholarship for SC/ST students in Assam provides ₹150 per month for day scholars and ₹350 per month for hostellers in Classes 9-10. Post-Matric Scholarship provides full tuition fee reimbursement and maintenance allowance for SC/ST students pursuing higher education with no income ceiling for ST and ₹2,50,000 income ceiling for SC. Applications submitted on PFMS portal.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-as-krishi-clause-1',
+    scheme_id: 'as-mukhyamantri-krishi-sa-sajuli',
+    clause_label: 'Krishi Sa-Sajuli — Free Agriculture Toolkit Eligibility',
+    content: 'Mukhyamantri Krishi Sa-Sajuli Yojana provides a free agriculture toolkit worth ₹5,000 including power tiller, harvester, or irrigation equipment to small farmers in Assam. Farmers with up to 5 bigha (1.67 acres) land are eligible. Applications are submitted through Agriculture Department offices or online portal. Priority is given to SC/ST farmers and women farmers.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];

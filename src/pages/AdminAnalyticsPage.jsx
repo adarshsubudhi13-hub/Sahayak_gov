@@ -27,17 +27,31 @@ const DEMO_DISTRICTS = [
 // ── Aggregate raw telemetry events into per-scheme stats ─────────────────────
 function aggregateTelemetry(events) {
   const byScheme = {};
+  const byDistrict = {};
+
   for (const event of events) {
+    // Per-scheme aggregation
     if (!byScheme[event.scheme_id]) {
       byScheme[event.scheme_id] = { searches: 0, matches: 0, applied: 0, viewed: 0 };
     }
     const s = byScheme[event.scheme_id];
-    if (event.event_type === 'matched')      s.matches++;
-    else if (event.event_type === 'viewed')  s.viewed++;
+    if (event.event_type === 'matched')      { s.matches++;  s.searches++; }
+    else if (event.event_type === 'viewed')  { s.viewed++;   s.searches++; }
     else if (event.event_type === 'applied') s.applied++;
-    s.searches = s.matches + s.viewed;
+    else if (event.event_type === 'chat_query') s.searches++;
+
+    // Per-district aggregation
+    const district = event.district || 'Unknown';
+    if (!byDistrict[district]) {
+      byDistrict[district] = { queries: 0, matches: 0, applications: 0 };
+    }
+    const d = byDistrict[district];
+    if (['matched', 'viewed', 'chat_query', 'saved'].includes(event.event_type)) d.queries++;
+    if (event.event_type === 'matched')  d.matches++;
+    if (event.event_type === 'applied')  d.applications++;
   }
-  return byScheme;
+
+  return { byScheme, byDistrict };
 }
 
 export function AdminAnalyticsPage() {

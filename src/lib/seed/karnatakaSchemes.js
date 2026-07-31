@@ -323,3 +323,30 @@ export const KARNATAKA_ELIGIBILITY_RULES = [
     match_reason_kn: 'ಅಸಂಘಟಿತ ವಲಯಗಳಲ್ಲಿನ ಮಹಿಳಾ ಕಾರ್ಮಿಕರು ಅರ್ಹರಾಗಿದ್ದಾರೆ.'
   }
 ];
+
+export const KARNATAKA_RAG_DOCUMENTS = [
+  {
+    id: 'doc-ka-scholarship-clause-1',
+    scheme_id: 'ka-post-matric-scholarship',
+    clause_label: 'Karnataka SC/ST Scholarship — SSP Portal Income & Eligibility Rules',
+    content: 'SC/ST students domiciled in Karnataka pursuing post-matric courses are eligible for fee reimbursement. Family annual income should not exceed ₹2,50,000. Applications are processed through the State Scholarship Portal (SSP). Students must maintain 75% attendance to be eligible for scholarship disbursement.',
+    language: 'en',
+    last_verified_at: '2026-07-01'
+  },
+  {
+    id: 'doc-ka-krishibhagya-clause-1',
+    scheme_id: 'ka-krishi-bhagya',
+    clause_label: 'Krishi Bhagya Scheme — Farm Pond Subsidy & Eligibility',
+    content: 'Karnataka Krishi Bhagya scheme provides 90% subsidy for construction of krishi honda (farm ponds) for dryland farmers with land holding up to 5 acres. Beneficiary must have own land with RTC record. Subsidy for drip and sprinkler irrigation up to 75% is also provided under the scheme through district-level agriculture offices.',
+    language: 'en',
+    last_verified_at: '2026-07-01'
+  },
+  {
+    id: 'doc-ka-grihalakshmi-clause-1',
+    scheme_id: 'ka-grihalakshmi',
+    clause_label: 'Gruha Lakshmi Guarantee — ₹2,000 Monthly Support for Women Heads',
+    content: 'Under Karnataka Gruha Lakshmi guarantee, the woman head of the family who is the ration card holder receives ₹2,000 per month directly into her bank account via DBT. Only one woman per household is eligible. The benefit is linked to the Seva Sindhu portal registration and Aadhaar-seeded bank account.',
+    language: 'en',
+    last_verified_at: '2026-07-01'
+  }
+];

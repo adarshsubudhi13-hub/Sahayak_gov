@@ -127,3 +127,30 @@ export const WESTBENGAL_ELIGIBILITY_RULES = [
     match_reason_bn: 'આ યોજના મહિલા વડા માટે સહાય પૂરી પાડે છે.'
   }
 ];
+
+export const WESTBENGAL_RAG_DOCUMENTS = [
+  {
+    id: 'doc-wb-kanyashree-clause-1',
+    scheme_id: 'wb-kanyashree',
+    clause_label: 'Kanyashree Prakalpa — Annual Stipend & One-Time Grant Eligibility',
+    content: 'Kanyashree Prakalpa provides ₹1,000 annual stipend (K-1) to girls aged 13-18 years studying in Classes 8 to 12 in recognised schools with family income below ₹1,20,000 per year. A one-time grant of ₹25,000 (K-2) is given to girls who remain unmarried and enrolled in education at 18 years. Applications submitted through school headmasters to Block Development Offices.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-wb-krishak-clause-1',
+    scheme_id: 'wb-krishak-bandhu',
+    clause_label: 'Krishak Bandhu — Annual Benefit & Eligibility Criteria',
+    content: 'West Bengal Krishak Bandhu provides ₹10,000 per year per acre (minimum ₹4,000 for holdings below 1 acre) to all farmers including bargadars (sharecroppers) recorded in the Bargadar Register. Additionally, a death benefit of ₹2 lakh is paid to the farmer family upon death of the beneficiary. Applications are registered through the e-District portal.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-wb-rupashree-clause-1',
+    scheme_id: 'wb-rupashree',
+    clause_label: 'Rupashree Prakalpa — Marriage Assistance Amount & Conditions',
+    content: 'West Bengal Rupashree Prakalpa provides a one-time grant of ₹25,000 to families for the marriage of their daughter. The family annual income must not exceed ₹1,50,000. The bride must be at least 18 years old and the groom at least 21 years. Application is submitted one to 60 days before the proposed marriage date through BDO or SDO office.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];

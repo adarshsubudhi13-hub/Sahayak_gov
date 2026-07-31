@@ -332,4 +332,30 @@ export const RAJASTHAN_ELIGIBILITY_RULES = [
   }
 ];
 
-export const RAJASTHAN_RAG_DOCUMENTS = [];
+
+export const RAJASTHAN_RAG_DOCUMENTS = [
+  {
+    id: 'doc-rj-chiranjeevi-clause-1',
+    scheme_id: 'rj-chiranjeevi-swasthya',
+    clause_label: 'Chiranjeevi Swasthya Bima — Coverage Limit & Empanelled Hospitals',
+    content: 'CM Chiranjeevi Swasthya Bima Yojana provides cashless medical treatment up to ₹10 lakh per family per year, with an additional buffer of ₹5 lakh for serious illnesses. All state resident families registered on Jan Aadhaar portal are eligible. Treatment is available at all government hospitals and empanelled private hospitals across Rajasthan.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-rj-palanhar-clause-1',
+    scheme_id: 'rj-palanhar',
+    clause_label: 'Palanhar Yojana — Monthly Grant & Beneficiary Categories',
+    content: 'Palanhar Yojana provides monthly financial assistance for the upbringing of orphaned and vulnerable children through a designated guardian. ₹500 per month for children aged 0-6 years and ₹1,000 per month for children aged 6-18 years studying in schools. Categories covered include children of widows, disabled parents, prisoners, AIDS-affected, and divorced women.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-rj-tarbandi-clause-1',
+    scheme_id: 'rj-tarbandi',
+    clause_label: 'Rajasthan Tarbandi Yojana — Fencing Subsidy for Farmers',
+    content: 'Rajasthan Tarbandi Yojana provides 50% subsidy up to ₹48,000 for fencing of agricultural land to protect crops from stray animals. A minimum of 0.5 hectare land is required. Small and marginal farmers with land up to 2 hectares are given priority. Application submitted through e-Mitra or Rajkishan portal with Jamabandi copy and bank details.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];

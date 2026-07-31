@@ -331,4 +331,30 @@ export const BIHAR_ELIGIBILITY_RULES = [
   }
 ];
 
-export const BIHAR_RAG_DOCUMENTS = [];
+
+export const BIHAR_RAG_DOCUMENTS = [
+  {
+    id: 'doc-br-kanya-utthan-clause-1',
+    scheme_id: 'br-mukhyamantri-kanya-utthan',
+    clause_label: 'Kanya Utthan Yojana — Graduation Grant Eligibility & Amount',
+    content: 'Bihar Mukhyamantri Kanya Utthan Yojana provides ₹50,000 as one-time financial assistance to girls who complete graduation from recognized universities in Bihar. Only unmarried girls at the time of graduation are eligible. The scheme also provides ₹25,000 for Inter (Class 12) pass girls and ₹2,000 for Class 10 pass. Applications submitted through eKalyan portal.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-br-kanya-utthan-clause-2',
+    scheme_id: 'br-mukhyamantri-kanya-utthan',
+    clause_label: 'Kanya Utthan — Application Portal & Bank Account Requirements',
+    content: 'Students must register and apply on the eKalyan portal (edudbt.bih.nic.in). Required documents include degree certificate or mark sheet, Aadhaar card, bank account details with IFSC code, and recent passport-size photograph. Bank account must be in the applicant\'s own name and Aadhaar-seeded for DBT.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-br-farmer-clause-1',
+    scheme_id: 'br-diesel-anudan',
+    clause_label: 'Bihar Diesel Anudan — Subsidy Amount & Eligible Crops',
+    content: 'Bihar Diesel Anudan provides ₹50 per litre diesel subsidy for irrigation of paddy and other Kharif crops, up to a maximum of ₹400 per acre per season. Farmers must have land records (LPC) and register on the DBT Agriculture portal of Bihar. Subsidy directly credited to Aadhaar-linked bank account after verification.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];

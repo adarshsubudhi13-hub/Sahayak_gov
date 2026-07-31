@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useStateContext } from '../context/StateContext.jsx';
 import { CitationChip } from '../components/CitationChip.jsx';
 import { ConfidenceBanner } from '../components/ConfidenceBanner.jsx';
+import { VoiceInput, TTSButton } from '../components/VoiceInput.jsx';
 import { processGroundedRAGQuery } from '../lib/rag/ragService.js';
 import { insertChatLog, insertFlaggedResponse } from '../lib/supabase/db.js';
-import { TELANGANA_SCHEMES } from '../lib/seed/telanganaSchemes.js';
-import { Send, Sparkles, ShieldCheck, Flag, Bot, User, Cpu } from 'lucide-react';
+import { Send, Sparkles, ShieldCheck, Flag, Bot, User, Cpu, BookOpen, AlertTriangle } from 'lucide-react';
 
 const WELCOME_MESSAGE = {
   id: 'welcome-msg',
@@ -26,6 +27,7 @@ export function ChatPage() {
   const schemeIdParam = searchParams.get('schemeId');
   const { language, t } = useLanguage();
   const { userId, isSupabaseConfigured } = useAuth();
+  const { selectedStateId, hasRagCorpus, selectedState, stateSchemes } = useStateContext();
 
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);
   const [inputQuery, setInputQuery] = useState('');
@@ -38,11 +40,14 @@ export function ChatPage() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!inputQuery.trim() || loading) return;
+  // Update scheme dropdown when schemeId param changes
+  useEffect(() => {
+    if (schemeIdParam) setSelectedSchemeId(schemeIdParam);
+  }, [schemeIdParam]);
 
-    const userQuery = inputQuery.trim();
+  const handleSend = async (queryText) => {
+    const userQuery = (queryText || inputQuery).trim();
+    if (!userQuery || loading) return;
     setInputQuery('');
     setLoading(true);
 
@@ -50,7 +55,8 @@ export function ChatPage() {
       const ragResult = await processGroundedRAGQuery(
         userQuery,
         selectedSchemeId || undefined,
-        language
+        language,
+        selectedStateId
       );
 
       const newMsg = {
@@ -67,7 +73,7 @@ export function ChatPage() {
 
       setMessages(prev => [...prev, newMsg]);
 
-      // Persist chat log to Supabase
+      // Persist to Supabase
       if (isSupabaseConfigured) {
         const dbLog = await insertChatLog(userId, {
           scheme_id: selectedSchemeId || null,
@@ -79,13 +85,11 @@ export function ChatPage() {
           language,
         });
         if (dbLog) {
-          // Update msg id to match DB row id for flagging
           setMessages(prev =>
             prev.map(m => m.id === newMsg.id ? { ...m, db_id: dbLog.id } : m)
           );
         }
       } else {
-        // LocalStorage fallback for review queue
         const localLogs = JSON.parse(localStorage.getItem('sahayak_chat_logs') || '[]');
         localLogs.unshift(newMsg);
         localStorage.setItem('sahayak_chat_logs', JSON.stringify(localLogs.slice(0, 100)));
@@ -108,6 +112,17 @@ export function ChatPage() {
     }
   };
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    handleSend();
+  };
+
+  const handleVoiceTranscript = (transcript) => {
+    setInputQuery(transcript);
+    // Auto-send after a short delay so user can see what was transcribed
+    setTimeout(() => handleSend(transcript), 400);
+  };
+
   const handleFlagMessage = async (msg) => {
     if (flaggedIds.has(msg.id)) return;
     setFlaggedIds(prev => new Set([...prev, msg.id]));
@@ -123,54 +138,65 @@ export function ChatPage() {
     if (isSupabaseConfigured) {
       await insertFlaggedResponse(userId, flagData);
     } else {
-      // LocalStorage fallback
       const queue = JSON.parse(localStorage.getItem('sahayak_review_queue') || '[]');
-      queue.push({
-        id: `flag-${Date.now()}`,
-        ...flagData,
-        status: 'pending',
-        created_at: new Date().toISOString(),
-      });
+      queue.push({ id: `flag-${Date.now()}`, ...flagData, status: 'pending', created_at: new Date().toISOString() });
       localStorage.setItem('sahayak_review_queue', JSON.stringify(queue));
     }
   };
 
-  const selectedSchemeObj = TELANGANA_SCHEMES.find(s => s.id === selectedSchemeId);
+  // Schemes for dropdown — only state schemes (not all states)
+  const stateSchemeOptions = stateSchemes.filter(s => s.state === selectedState?.name);
 
   return (
-    <main className="flex-1 max-w-4xl w-full mx-auto py-6 px-4 flex flex-col h-[calc(100vh-5rem)]">
+    <main className="flex-1 max-w-4xl w-full mx-auto py-6 px-4 flex flex-col" style={{ height: 'calc(100vh - 5rem)' }}>
 
-      {/* Header bar */}
-      <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-xs mb-4 flex items-center justify-between gap-4">
+      {/* Header */}
+      <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-xs mb-4 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2 text-xs">
           <ShieldCheck className="w-5 h-5 text-teal-700" />
           <div>
             <span className="font-bold text-gray-900">{t('chatTitle')}</span>
             <span className="text-gray-500 block text-[11px]">
-              {selectedSchemeObj
-                ? `Scoped to: ${selectedSchemeObj.name_en}`
-                : 'Searching all Telangana Schemes'}
+              {selectedState?.name} ·{' '}
+              {selectedSchemeId
+                ? `Scoped to scheme`
+                : 'All Schemes'}
             </span>
           </div>
         </div>
 
-        <select
-          value={selectedSchemeId}
-          onChange={e => setSelectedSchemeId(e.target.value)}
-          className="text-xs border border-gray-300 rounded-xl px-3 py-1.5 bg-white text-gray-700 font-medium outline-none focus:ring-2 focus:ring-teal-600"
-        >
-          <option value="">All Schemes (General Chat)</option>
-          {TELANGANA_SCHEMES.map(s => (
-            <option key={s.id} value={s.id}>{s.name_en}</option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          {/* Corpus coverage badge */}
+          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold border ${
+            hasRagCorpus
+              ? 'bg-teal-50 border-teal-200 text-teal-800'
+              : 'bg-amber-50 border-amber-200 text-amber-800'
+          }`}>
+            {hasRagCorpus ? (
+              <><BookOpen className="w-3 h-3" /> Full Document-Backed AI</>
+            ) : (
+              <><AlertTriangle className="w-3 h-3" /> Listing Only</>
+            )}
+          </span>
+
+          <select
+            value={selectedSchemeId}
+            onChange={e => setSelectedSchemeId(e.target.value)}
+            className="text-xs border border-gray-300 rounded-xl px-3 py-1.5 bg-white text-gray-700 font-medium outline-none focus:ring-2 focus:ring-teal-600 max-w-[200px]"
+          >
+            <option value="">All Schemes</option>
+            {stateSchemeOptions.map(s => (
+              <option key={s.id} value={s.id}>{s.name_en}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 bg-white rounded-3xl border border-gray-200 p-6 overflow-y-auto space-y-6 shadow-sm">
+      <div className="flex-1 bg-white rounded-3xl border border-gray-200 p-5 overflow-y-auto space-y-6 shadow-sm">
         {messages.map((msg, index) => (
           <div key={msg.id || index} className="space-y-3">
-            {/* User message */}
+            {/* User bubble */}
             {msg.id !== 'welcome-msg' && msg.query_text && (
               <div className="flex items-start justify-end gap-2.5">
                 <div className="bg-teal-700 text-white rounded-2xl rounded-tr-none px-4 py-3 text-xs max-w-md shadow-xs leading-relaxed font-medium">
@@ -182,7 +208,7 @@ export function ChatPage() {
               </div>
             )}
 
-            {/* AI response */}
+            {/* AI bubble */}
             <div className="flex items-start gap-2.5">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-800 to-slate-900 text-white flex items-center justify-center shrink-0 shadow">
                 <Bot className="w-4 h-4 text-amber-400" />
@@ -193,11 +219,11 @@ export function ChatPage() {
 
                   {msg.was_low_confidence
                     ? <ConfidenceBanner message={msg.response_text} />
-                    : <p>{msg.response_text}</p>
+                    : <p className="whitespace-pre-wrap">{msg.response_text}</p>
                   }
 
                   {msg.citations?.length > 0 && !msg.was_low_confidence && (
-                    <div className="pt-2">
+                    <div className="pt-2 space-y-1">
                       <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">
                         {t('citationTitle')}
                       </p>
@@ -211,13 +237,14 @@ export function ChatPage() {
                   {msg.is_real_ai && (
                     <div className="pt-2 flex items-center gap-1 text-[11px] text-teal-700 font-semibold">
                       <Cpu className="w-3 h-3" />
-                      Generated by GPT-4o-mini · Grounded in official clauses
+                      GPT-4o-mini · Grounded in official clauses
                     </div>
                   )}
 
-                  {/* Flag button */}
+                  {/* Footer: TTS + flag */}
                   {msg.id !== 'welcome-msg' && (
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-end">
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                      <TTSButton text={msg.response_text} language={msg.language} />
                       {flaggedIds.has(msg.id) ? (
                         <span className="text-[11px] text-amber-700 font-semibold">
                           {t('flaggedSuccess')}
@@ -249,8 +276,13 @@ export function ChatPage() {
         <div ref={chatEndRef} />
       </div>
 
-      {/* Input */}
-      <form onSubmit={handleSend} className="mt-4 flex items-center gap-2">
+      {/* Input row */}
+      <form onSubmit={handleFormSubmit} className="mt-4 flex items-center gap-2">
+        <VoiceInput
+          onTranscript={handleVoiceTranscript}
+          language={language}
+          disabled={loading}
+        />
         <input
           type="text"
           value={inputQuery}
@@ -261,10 +293,10 @@ export function ChatPage() {
         <button
           type="submit"
           disabled={loading || !inputQuery.trim()}
-          className="px-6 py-3.5 rounded-2xl bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-white font-bold text-xs shadow transition-all flex items-center gap-2"
+          className="px-5 py-3.5 rounded-2xl bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-white font-bold text-xs shadow transition-all flex items-center gap-2"
         >
-          <span>{t('sendBtn')}</span>
           <Send className="w-4 h-4 text-amber-300" />
+          {t('sendBtn')}
         </button>
       </form>
     </main>

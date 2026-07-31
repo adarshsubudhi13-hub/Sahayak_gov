@@ -163,3 +163,46 @@ export const CENTRAL_ELIGIBILITY_RULES = [
     match_reason_hi: 'आय आयुष्मान भारत पात्रता मानदंडों के अंतर्गत आती है।'
   }
 ];
+
+export const CENTRAL_RAG_DOCUMENTS = [
+  {
+    id: 'doc-pmkisan-clause-1',
+    scheme_id: 'central-pm-kisan',
+    clause_label: 'PM-KISAN Operational Guidelines — Eligibility & Exclusions',
+    content: 'PM-KISAN provides income support of ₹6,000 per year in three equal installments of ₹2,000 to all landholding farmer families with cultivable land as per land records. Institutional landholders, farmers holding constitutional posts, current or former income tax payees, and those with monthly pension above ₹10,000 are excluded.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-pmkisan-clause-2',
+    scheme_id: 'central-pm-kisan',
+    clause_label: 'PM-KISAN — Registration & Aadhaar Seeding Requirement',
+    content: 'Farmer registration must be completed on the PM-KISAN portal (pmkisan.gov.in). Aadhaar number must be seeded with the bank account for Direct Benefit Transfer. New registrations require verification by village-level revenue officials before first installment is released.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-ayushman-clause-1',
+    scheme_id: 'central-pm-jan-arogya',
+    clause_label: 'Ayushman Bharat PM-JAY — Coverage Scope & Beneficiary Identification',
+    content: 'Ayushman Bharat PM-JAY provides cashless health coverage of ₹5 lakh per family per year for secondary and tertiary care hospitalization. Beneficiary families are identified from SECC 2011 database and State government schemes merged with AB PM-JAY. Beneficiaries can avail treatment at any empanelled public or private hospital across India.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-pmay-clause-1',
+    scheme_id: 'central-pmay-gramin',
+    clause_label: 'PMAY-G — Financial Assistance & Beneficiary Selection',
+    content: 'Under PMAY-Gramin, eligible rural BPL households receive financial assistance of ₹1,20,000 (plain areas) and ₹1,30,000 (hilly/difficult areas) for construction of a pucca house of minimum 25 sqm. Beneficiaries are selected through SECC 2011 data and Gram Sabha verification. MGNREGS wage support of 90-95 days is additionally provided.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-mudra-clause-1',
+    scheme_id: 'central-mudra-yojana',
+    clause_label: 'PM Mudra Yojana — Three Loan Categories & Eligible Enterprises',
+    content: 'PM Mudra Yojana provides collateral-free loans to non-corporate small business segments in three categories: Shishu (up to ₹50,000), Kishore (₹50,001 to ₹5 lakh), and Tarun (₹5 lakh to ₹10 lakh). All non-farm micro enterprises engaged in manufacturing, trading, or service activities are eligible including self-employed artisans, vendors, and small shopkeepers.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];

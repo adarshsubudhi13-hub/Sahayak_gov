@@ -137,3 +137,30 @@ export const ODISHA_ELIGIBILITY_RULES = [
     match_reason_or: 'ବାର୍ଦ୍ଧକ୍ୟ ଭତ୍ତା ପାଇଁ ଯୋଗ୍ୟ।'
   }
 ];
+
+export const ODISHA_RAG_DOCUMENTS = [
+  {
+    id: 'doc-od-madhubabu-clause-1',
+    scheme_id: 'od-madhu-babu-pension',
+    clause_label: 'MBPY — Pension Amount, Eligibility Age & Categories',
+    content: 'Madhu Babu Pension Yojana provides ₹500 per month to elderly citizens aged 60 and above, widows aged 40+ without family support, and persons with 40% or more disability, all belonging to BPL families in Odisha. Enhanced pension of ₹700 per month for those aged 80 and above. Applications submitted through the Gram Panchayat or Urban Local Body office with Aadhaar, BPL card, and age proof.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-od-biju-scholarship-clause-1',
+    scheme_id: 'od-biju-swasthya-kalyan',
+    clause_label: 'Biju Swasthya Kalyan Yojana — Family Cover & Empanelled Hospitals',
+    content: 'Biju Swasthya Kalyan Yojana provides cashless medical coverage of ₹5 lakh per family per year for BPL and KALIA beneficiary families in Odisha. Women are additionally covered for up to ₹10 lakh. Coverage includes all secondary and tertiary care treatments at government and empanelled private hospitals. Smart Health Card issued to family is the access mechanism.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-od-kalia-clause-1',
+    scheme_id: 'od-kalia',
+    clause_label: 'KALIA Scheme — Seasonal Assistance & Livelihood Support',
+    content: 'KALIA (Krushak Assistance for Livelihood and Income Augmentation) provides ₹10,000 financial assistance per season (Kharif and Rabi) to small and marginal farmers in Odisha for procurement of inputs. Landless agricultural labourers receive ₹12,500 per year for livelihood activities. Vulnerable agricultural households receive ₹10,000 per year for subsistence. Applications registered through Gram Panchayat.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];

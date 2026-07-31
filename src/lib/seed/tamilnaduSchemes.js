@@ -195,3 +195,30 @@ export const TAMILNADU_ELIGIBILITY_RULES = [
     match_reason_ta: 'ஆண்டு வருமானம் ₹1.2 லட்சத்திற்கும் குறைவாக உள்ள குடும்பங்கள் CMCHIS திட்டத்திற்குத் தகுதியானவர்கள்.'
   }
 ];
+
+export const TAMILNADU_RAG_DOCUMENTS = [
+  {
+    id: 'doc-tn-pudhumaipenn-clause-1',
+    scheme_id: 'tn-moovalur-ramamirtham-scholarship',
+    clause_label: 'Pudhumai Penn Scheme — Eligibility & Monthly ₹1,000 Stipend Rules',
+    content: 'Girls who have studied from Class 6 to Class 12 entirely in Tamil Nadu government or government-aided schools are eligible for ₹1,000 per month stipend when pursuing higher education. The benefit continues until the completion of the enrolled course. Applications are processed through the scheme portal with Aadhaar and bank account verification.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-tn-magalir-urimai-clause-1',
+    scheme_id: 'tn-kalaignar-magalir-urimai-thittam',
+    clause_label: 'Magalir Urimai Thittam — Eligibility Criteria & Exclusions',
+    content: 'Kalaignar Magalir Urimai Thittam provides ₹1,000 per month to eligible women who are family heads. Women whose family annual income does not exceed ₹2,50,000 and who are not income tax payees are eligible. Government employees, pensioners receiving monthly pension above ₹1,500, and those owning four-wheelers are excluded from the scheme.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-tn-breakfast-clause-1',
+    scheme_id: 'tn-chief-minister-breakfast',
+    clause_label: 'CM Breakfast Scheme — Coverage & Nutritional Standards',
+    content: 'The Chief Minister Breakfast Scheme covers students of Classes 1 to 5 in all government elementary schools across Tamil Nadu. The breakfast menu includes semiya upma, pongal, or other nutritious items meeting ICDS standards. No application is required; students enrolled in government schools are automatically covered.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];

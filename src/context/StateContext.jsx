@@ -16,6 +16,7 @@ import { PUNJAB_SCHEMES, PUNJAB_ELIGIBILITY_RULES } from '../lib/seed/punjabSche
 import { ODISHA_SCHEMES, ODISHA_ELIGIBILITY_RULES } from '../lib/seed/odishaSchemes.js';
 import { ASSAM_SCHEMES, ASSAM_ELIGIBILITY_RULES } from '../lib/seed/assamSchemes.js';
 import { CENTRAL_SCHEMES, CENTRAL_ELIGIBILITY_RULES } from '../lib/seed/centralSchemes.js';
+import { STATES_WITH_RAG_CORPUS } from '../lib/rag/ragService.js';
 
 const StateContext = createContext();
 
@@ -86,6 +87,7 @@ export function StateProvider({ children }) {
       hasChosenState,
       stateSchemes,
       stateRules,
+      hasRagCorpus: STATES_WITH_RAG_CORPUS.has(selectedStateId),
     }}>
       {children}
     </StateContext.Provider>

@@ -117,3 +117,30 @@ export const MP_ELIGIBILITY_RULES = [
     match_reason_hi: 'किसान इस अनुदान के पात्र हैं।'
   }
 ];
+
+export const MP_RAG_DOCUMENTS = [
+  {
+    id: 'doc-mp-ladli-laxmi-clause-1',
+    scheme_id: 'mp-ladli-laxmi',
+    clause_label: 'Ladli Laxmi Yojana — Certificate Amount & Installment Structure',
+    content: 'Ladli Laxmi Yojana provides ₹1,43,000 in total benefit across multiple milestones. ₹6,000 is invested in NSC annually for five years. Educational grants of ₹2,000 on Class 6, ₹4,000 on Class 9, ₹6,000 on Class 11 and ₹6,000 on Class 12 admissions are provided. A final ₹1,00,000 lump sum is given at marriage after 21 years or on completion of Class 12 examination.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-mp-sambal-clause-1',
+    scheme_id: 'mp-mukhyamantri-jan-kalyan-sambal',
+    clause_label: 'Sambal Yojana — Unorganised Worker Benefits & Registration',
+    content: 'MP Mukhyamantri Jan Kalyan (Sambal) Yojana covers unorganised sector workers below the poverty line registered on the Sambal portal. Benefits include: free medical treatment, education support (₹5,000 to ₹12,000 per student per year), accident relief (₹2 lakh), and funeral assistance (₹5,000). Registration is done at Gram Panchayat or Jan Seva Kendra with Aadhaar.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-mp-kisan-anudan-clause-1',
+    scheme_id: 'mp-kisan-anudan',
+    clause_label: 'MP Kisan Anudan — Agricultural Equipment Subsidy Rates',
+    content: 'MP Kisan Anudan scheme provides subsidies of 40-50% for general farmers and 50-60% for SC/ST and women farmers on purchase of agricultural equipment including power tillers, reapers, seed drills, and rotavators. Application must be submitted through MP Kisan App or Gram Panchayat before purchasing equipment. Subsidy is directly transferred after purchase verification.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];

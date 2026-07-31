@@ -340,4 +340,30 @@ export const UP_ELIGIBILITY_RULES = [
   }
 ];
 
-export const UP_RAG_DOCUMENTS = [];
+
+export const UP_RAG_DOCUMENTS = [
+  {
+    id: 'doc-up-kanya-sumangala-clause-1',
+    scheme_id: 'up-kanya-sumangala',
+    clause_label: 'Kanya Sumangala Yojana — Six Milestones & Installment Amounts',
+    content: 'Mukhyamantri Kanya Sumangala Yojana provides ₹15,000 across six installments: ₹2,000 at birth, ₹1,000 at 1-year vaccination, ₹2,000 on Class 1 admission, ₹2,000 on Class 6 admission, ₹3,000 on Class 9 admission, and ₹5,000 on Class 12 or higher admission. Family annual income must not exceed ₹3,00,000 and the family must have maximum two children.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-up-kanya-sumangala-clause-2',
+    scheme_id: 'up-kanya-sumangala',
+    clause_label: 'Kanya Sumangala — Application Process & Required Documents',
+    content: 'Applications for Kanya Sumangala are submitted online through the MKSY portal (mksy.up.gov.in) or offline through the Block Development Officer. Required documents include Aadhaar of parent/guardian, birth certificate of girl child, income certificate from Tehsildar, bank passbook, and for education installments, bonafide certificate from school.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-up-pension-clause-1',
+    scheme_id: 'up-old-age-pension',
+    clause_label: 'UP Old Age Pension — Eligibility & Monthly Benefit Amount',
+    content: 'Citizens aged 60 years and above domiciled in Uttar Pradesh with BPL status are eligible for Vridha Avasta Pension of ₹1,000 per month (₹500 from state + ₹500 from centre under IGNOAPS). Applications are submitted through the integrated pension portal. Aadhaar-linked bank account mandatory for DBT.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];
