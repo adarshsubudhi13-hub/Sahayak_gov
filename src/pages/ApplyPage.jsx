@@ -14,6 +14,8 @@ import {
   ArrowLeft, FileText, CheckCircle2, RefreshCw,
   AlertCircle, ExternalLink, Building2, MapPin
 } from 'lucide-react';
+import { applyLimiter } from '../lib/rateLimiter.js';
+import { sanitizeText, validateNotes } from '../lib/validation.js';
 
 export function ApplyPage() {
   const { schemeId } = useParams();

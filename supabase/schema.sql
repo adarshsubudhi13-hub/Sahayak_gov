@@ -253,3 +253,99 @@ create index if not exists idx_chat_logs_user_id
 
 create index if not exists idx_flagged_status
   on public.flagged_responses(status);
+
+-- ============================================================
+-- Phase 3 Additions — Compliance & Hardening
+-- ============================================================
+
+-- ── Consent Records ───────────────────────────────────────────────────────────
+-- Retained for 7 years per DPDP Act 2023 requirement.
+
+create table if not exists public.consent_records (
+  id              uuid primary key default gen_random_uuid(),
+  user_id         uuid not null references auth.users(id) on delete cascade,
+  version         text not null,                   -- consent notice version e.g. '1.0'
+  consented       boolean not null,
+  consented_at    timestamptz,
+  withdrawn_at    timestamptz,
+  channel         text default 'web'
+                    check (channel in ('web', 'whatsapp', 'ivr')),
+  ip_hash         text,                            -- hashed IP for audit, never raw IP
+  created_at      timestamptz default now()
+);
+
+alter table public.consent_records enable row level security;
+
+create policy "Users can insert own consent"
+  on public.consent_records for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can view own consent"
+  on public.consent_records for select
+  using (auth.uid() = user_id);
+
+create policy "Admins can view all consent records"
+  on public.consent_records for select
+  using (
+    exists (
+      select 1 from public.profiles
+      where id = auth.uid() and role = 'admin'
+    )
+  );
+
+create index if not exists idx_consent_user_id
+  on public.consent_records(user_id);
+
+-- ── Hardened RLS: prevent anonymous inserts on profiles ──────────────────────
+-- Only authenticated users can insert/update their own profile.
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where tablename = 'profiles' and policyname = 'Authenticated users only on profiles'
+  ) then
+    execute 'create policy "Authenticated users only on profiles"
+      on public.profiles for insert
+      with check (auth.role() = ''authenticated'' and auth.uid() = id)';
+  end if;
+end $$;
+
+-- ── Rate limiting support table ───────────────────────────────────────────────
+-- Tracks per-user action counts for server-side rate limiting.
+
+create table if not exists public.rate_limit_events (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid references auth.users(id) on delete cascade,
+  action      text not null check (action in ('otp_request', 'rag_query', 'apply', 'profile_save')),
+  created_at  timestamptz default now()
+);
+
+alter table public.rate_limit_events enable row level security;
+
+create policy "System can insert rate limit events"
+  on public.rate_limit_events for insert
+  with check (true);
+
+create policy "Admins can view rate limit events"
+  on public.rate_limit_events for select
+  using (
+    exists (
+      select 1 from public.profiles
+      where id = auth.uid() and role = 'admin'
+    )
+  );
+
+create index if not exists idx_rate_limit_user_action
+  on public.rate_limit_events(user_id, action, created_at);
+
+-- ── Auto-cleanup: purge rate_limit_events older than 1 hour ──────────────────
+-- Run this as a scheduled function in Supabase cron (pg_cron extension).
+-- create extension if not exists pg_cron;
+-- select cron.schedule('cleanup-rate-limits', '*/30 * * * *',
+--   'delete from public.rate_limit_events where created_at < now() - interval ''1 hour''');
+
+-- ── Trigger: auto-update consent records updated_at ──────────────────────────
+create trigger consent_records_updated_at
+  before update on public.consent_records
+  for each row execute procedure update_updated_at();

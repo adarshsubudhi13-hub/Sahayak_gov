@@ -9,6 +9,8 @@ import { VoiceInput, TTSButton } from '../components/VoiceInput.jsx';
 import { processGroundedRAGQuery } from '../lib/rag/ragService.js';
 import { insertChatLog, insertFlaggedResponse } from '../lib/supabase/db.js';
 import { Send, Sparkles, ShieldCheck, Flag, Bot, User, Cpu, BookOpen, AlertTriangle } from 'lucide-react';
+import { ragLimiter } from '../lib/rateLimiter.js';
+import { validateChatQuery } from '../lib/validation.js';
 
 const WELCOME_MESSAGE = {
   id: 'welcome-msg',
