@@ -1,0 +1,17 @@
+{
+  "short_name": "Sahayak",
+  "name": "Sahayak — AI Government Scheme Navigator",
+  "description": "Source-grounded, multilingual AI platform for Indian citizens to discover and apply for government welfare schemes.",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0f766e",
+  "background_color": "#f8fafc",
+  "orientation": "portrait-primary"
+}

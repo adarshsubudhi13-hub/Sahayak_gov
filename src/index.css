@@ -105,3 +105,42 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ─── High Contrast Mode (GIGW 3.0 / WCAG 2.1 AAA) ─── */
+html.high-contrast {
+  filter: contrast(125%);
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+html.high-contrast body {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+html.high-contrast header,
+html.high-contrast main,
+html.high-contrast footer,
+html.high-contrast nav,
+html.high-contrast div,
+html.high-contrast section,
+html.high-contrast article {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #f59e0b !important;
+}
+
+html.high-contrast button,
+html.high-contrast a {
+  border: 1px solid #f59e0b !important;
+  color: #fef08a !important;
+}
+
+html.high-contrast input,
+html.high-contrast select,
+html.high-contrast textarea {
+  background-color: #020617 !important;
+  color: #ffffff !important;
+  border: 2px solid #f59e0b !important;
+}
+

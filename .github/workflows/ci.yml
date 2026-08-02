@@ -1,0 +1,41 @@
+name: Sahayak CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build & Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Vite build
+        env:
+          # Stub env vars so the build never fails due to missing secrets
+          VITE_SUPABASE_URL: https://stub.supabase.co
+          VITE_SUPABASE_ANON_KEY: stub-anon-key
+          VITE_OPENAI_API_KEY: sk-stub-key
+          VITE_CONFIDENCE_THRESHOLD: '0.72'
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7

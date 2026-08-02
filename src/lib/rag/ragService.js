@@ -1,287 +1,407 @@
-import { TELANGANA_RAG_DOCUMENTS, TELANGANA_SCHEMES } from '../seed/telanganaSchemes.js';
-
-// Threshold for strict vector similarity (cosine similarity)
-export const CONFIDENCE_THRESHOLD = 0.75;
-
 /**
- * SIMULATED FULL-STACK RAG API
- * This simulates the /api/rag/search endpoint.
- * The backend handles BOTH the Pinecone vector search (using cosine similarity) 
- * AND the OpenAI LLM generation, ensuring API keys are never exposed on the client.
+ * Sahayak RAG Service – Phase 2
+ *
+ * Changes from Phase 1:
+ *  - Accepts stateId parameter and loads the correct state-specific RAG corpus
+ *  - All 11 states + central schemes now have document corpora
+ *  - Per-state embedding cache (keyed by stateId)
+ *  - isRealAI and hasCorpus flags in response for UI labelling
  */
-async function simulateBackendRagSearch(query, schemeId, language) {
-  // 1. Network Latency Simulation
-  await new Promise(resolve => setTimeout(resolve, 400));
+import { TELANGANA_RAG_DOCUMENTS, TELANGANA_SCHEMES } from '../seed/telanganaSchemes.js';
+import { MAHARASHTRA_RAG_DOCUMENTS, MAHARASHTRA_SCHEMES } from '../seed/maharashtraSchemes.js';
+import { KARNATAKA_RAG_DOCUMENTS, KARNATAKA_SCHEMES } from '../seed/karnatakaSchemes.js';
+import { TAMILNADU_RAG_DOCUMENTS, TAMILNADU_SCHEMES } from '../seed/tamilnaduSchemes.js';
+import { KERALA_RAG_DOCUMENTS, KERALA_SCHEMES } from '../seed/keralaSchemes.js';
+import { UP_RAG_DOCUMENTS, UP_SCHEMES } from '../seed/upSchemes.js';
+import { BIHAR_RAG_DOCUMENTS, BIHAR_SCHEMES } from '../seed/biharSchemes.js';
+import { RAJASTHAN_RAG_DOCUMENTS, RAJASTHAN_SCHEMES } from '../seed/rajasthanSchemes.js';
+import { GUJARAT_RAG_DOCUMENTS, GUJARAT_SCHEMES } from '../seed/gujaratSchemes.js';
+import { WESTBENGAL_RAG_DOCUMENTS, WESTBENGAL_SCHEMES } from '../seed/westbengalSchemes.js';
+import { MP_RAG_DOCUMENTS, MP_SCHEMES } from '../seed/mpSchemes.js';
+import { AP_RAG_DOCUMENTS, AP_SCHEMES } from '../seed/andhraPradeshSchemes.js';
+import { PUNJAB_RAG_DOCUMENTS, PUNJAB_SCHEMES } from '../seed/punjabSchemes.js';
+import { ODISHA_RAG_DOCUMENTS, ODISHA_SCHEMES } from '../seed/odishaSchemes.js';
+import { ASSAM_RAG_DOCUMENTS, ASSAM_SCHEMES } from '../seed/assamSchemes.js';
+import { CENTRAL_RAG_DOCUMENTS, CENTRAL_SCHEMES } from '../seed/centralSchemes.js';
 
-  // 2. Metadata Filtering (Backend handles Pinecone query)
-  const filteredDocs = TELANGANA_RAG_DOCUMENTS.filter(doc => !schemeId || doc.scheme_id === schemeId);
+// ── Config ─────────────────────────────────────────────────────────────────────
+export const CONFIDENCE_THRESHOLD = parseFloat(
+  import.meta.env.VITE_CONFIDENCE_THRESHOLD || '0.72'
+);
+const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+export const isOpenAIConfigured =
+  Boolean(OPENAI_API_KEY) && !OPENAI_API_KEY.startsWith('sk-...your') && OPENAI_API_KEY.trim() !== '';
 
-  // 3. Simulated Cosine Similarity Search
-  const queryTokens = query.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(Boolean);
-  
-  const scoredDocs = filteredDocs.map(doc => {
-    const text = doc.content + ' ' + doc.clause_label + ' ' + doc.scheme_id;
-    const textTokens = new Set(text.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(Boolean));
-    
-    if (queryTokens.length === 0 || textTokens.size === 0) return { doc, score: 0 };
-    
-    let matches = 0;
-    for (const token of queryTokens) {
-      if (textTokens.has(token) || Array.from(textTokens).some(t => t.includes(token) || token.includes(t))) {
-        matches += 1;
-      }
-    }
-    
-    const baseRatio = matches / queryTokens.length;
-    return {
-      doc,
-      // Simulated cosine similarity score
-      score: Math.min(0.95, baseRatio * 1.5)
-    };
-  });
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+export const isGroqConfigured =
+  Boolean(GROQ_API_KEY) && !GROQ_API_KEY.startsWith('gsk_...your') && GROQ_API_KEY.trim() !== '';
 
-  scoredDocs.sort((a, b) => b.score - a.score);
-  const topMatch = scoredDocs[0];
-  const topScore = topMatch ? topMatch.score : 0;
-  
-  const isLowConfidence = topScore < (CONFIDENCE_THRESHOLD - 0.25); // Adjusted for simulation
+const EMBEDDING_MODEL = 'text-embedding-3-small';
+const CHAT_MODEL = 'gpt-4o-mini';
+const TOP_K = 3;
 
-  // 4. Handle Low Confidence on Backend
-  if (isLowConfidence || !topMatch) {
-    const targetScheme = TELANGANA_SCHEMES.find(s => s.id === schemeId) || TELANGANA_SCHEMES[0];
-    
-    let fallbackText = `I'm not fully certain about this query based on retrieved official clauses. For exact rules, please visit the official portal: ${targetScheme.official_link}`;
-    if (language === 'hi') {
-      fallbackText = `प्राप्त आधिकारिक धाराओं के आधार पर मैं इस प्रश्न के बारे में पूरी तरह आश्वस्त नहीं हूँ। सटीक नियमों के लिए, कृपया सीधे आधिकारिक पोर्टल पर जाएँ: ${targetScheme.official_link}`;
-    } else if (language === 'te') {
-      fallbackText = `అధికారిక నిబంధనల ఆధారంగా ఈ ప్రశ్నకు సహాయక్ 100% ఖచ్చితమైన సమాధానం ఇవ్వలేకపోతోంది. దయచేసి నేరుగా పోర్టల్ చూడండి: ${targetScheme.official_link}`;
-    }
+// ── State corpus registry ─────────────────────────────────────────────────────
+const STATE_CORPUS_MAP = {
+  telangana:      { docs: TELANGANA_RAG_DOCUMENTS,  schemes: TELANGANA_SCHEMES  },
+  maharashtra:    { docs: MAHARASHTRA_RAG_DOCUMENTS, schemes: MAHARASHTRA_SCHEMES },
+  karnataka:      { docs: KARNATAKA_RAG_DOCUMENTS,  schemes: KARNATAKA_SCHEMES  },
+  tamil_nadu:     { docs: TAMILNADU_RAG_DOCUMENTS,  schemes: TAMILNADU_SCHEMES  },
+  kerala:         { docs: KERALA_RAG_DOCUMENTS,     schemes: KERALA_SCHEMES     },
+  uttar_pradesh:  { docs: UP_RAG_DOCUMENTS,          schemes: UP_SCHEMES         },
+  bihar:          { docs: BIHAR_RAG_DOCUMENTS,       schemes: BIHAR_SCHEMES      },
+  rajasthan:      { docs: RAJASTHAN_RAG_DOCUMENTS,   schemes: RAJASTHAN_SCHEMES  },
+  gujarat:        { docs: GUJARAT_RAG_DOCUMENTS,     schemes: GUJARAT_SCHEMES    },
+  west_bengal:    { docs: WESTBENGAL_RAG_DOCUMENTS,  schemes: WESTBENGAL_SCHEMES },
+  madhya_pradesh: { docs: MP_RAG_DOCUMENTS,          schemes: MP_SCHEMES         },
+  andhra_pradesh: { docs: AP_RAG_DOCUMENTS,          schemes: AP_SCHEMES         },
+  punjab:         { docs: PUNJAB_RAG_DOCUMENTS,      schemes: PUNJAB_SCHEMES     },
+  odisha:         { docs: ODISHA_RAG_DOCUMENTS,      schemes: ODISHA_SCHEMES     },
+  assam:          { docs: ASSAM_RAG_DOCUMENTS,       schemes: ASSAM_SCHEMES      },
+  central:        { docs: CENTRAL_RAG_DOCUMENTS,     schemes: CENTRAL_SCHEMES    },
+};
 
-    return {
-      responseText: fallbackText,
-      citations: topMatch ? [{
-        source_id: topMatch.doc.id,
-        clause_label: topMatch.doc.clause_label,
-        last_verified_at: topMatch.doc.last_verified_at,
-        content_snippet: topMatch.doc.content.substring(0, 120) + '...'
-      }] : [],
-      confidenceScore: topScore,
-      wasLowConfidence: true,
-      retrievedDocs: topMatch ? [topMatch.doc] : []
-    };
+/** States that have a full clause-level document corpus */
+export const STATES_WITH_RAG_CORPUS = new Set(Object.keys(STATE_CORPUS_MAP));
+
+/** Get documents and schemes for a given stateId, with central always merged in */
+function getCorpus(stateId) {
+  const state = STATE_CORPUS_MAP[stateId];
+  const central = STATE_CORPUS_MAP.central;
+  if (!state) {
+    return { docs: central.docs, schemes: central.schemes, hasCorpus: true };
   }
-
-  // 5. Backend LLM Generation (Simulated)
-  const retrievedDocs = scoredDocs.slice(0, 2).map(m => m.doc);
-  const citations = retrievedDocs.map(doc => ({
-    source_id: doc.id,
-    clause_label: doc.clause_label,
-    last_verified_at: doc.last_verified_at,
-    content_snippet: doc.content
-  }));
-
-  // In reality, the backend would call OpenAI here securely. 
-  // For the simulation, we'll try the local keys if available, or fallback.
-  let responseText = await simulateSecureBackendLLMCall(query, retrievedDocs, language);
-  
-  if (!responseText) {
-    if (language === 'hi') {
-      responseText = `आधिकारिक सरकारी दिशा-निर्देशों के अनुसार (${retrievedDocs[0].clause_label}): ${retrievedDocs[0].content}`;
-    } else if (language === 'te') {
-      responseText = `అధికారిక ప్రభుత్వ నిబంధనల ప్రకారం (${retrievedDocs[0].clause_label}): ${retrievedDocs[0].content}`;
-    } else {
-      responseText = `According to official government guidelines (${retrievedDocs[0].clause_label}): ${retrievedDocs[0].content}`;
-    }
-  }
-
   return {
-    responseText,
-    citations,
-    confidenceScore: topScore,
-    wasLowConfidence: false,
-    retrievedDocs
+    docs: [...state.docs, ...central.docs],
+    schemes: [...state.schemes, ...central.schemes],
+    hasCorpus: true,
   };
 }
 
-// Helper to simulate the backend LLM call (keeping keys safe on the server)
-async function simulateSecureBackendLLMCall(query, retrievedDocs, language) {
-  let openAiKey = import.meta.env.VITE_OPENAI_API_KEY;
-  let geminiKey = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_GEMINIAPI;
-  let groqKey = import.meta.env.VITE_GROQ_API_KEY || import.meta.env.VITE_GROQAPI;
+// ── Per-state embedding cache (Map<stateId, Array<{doc, embedding}>>)  ─────────
+const _embeddingCache = new Map();
 
-  // Auto-detect Groq keys starting with gsk_ even if pasted into Gemini/OpenAI env variables
-  if (geminiKey && geminiKey.startsWith('gsk_')) {
-    groqKey = geminiKey;
-    geminiKey = null;
+// ── Utility: cosine similarity ─────────────────────────────────────────────────
+function cosineSimilarity(a, b) {
+  if (a.length !== b.length) return 0;
+  let dot = 0, normA = 0, normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot   += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
   }
-  if (openAiKey && openAiKey.startsWith('gsk_')) {
-    groqKey = openAiKey;
-    openAiKey = null;
-  }
-
-  if (!openAiKey && !geminiKey && !groqKey) return null;
-
-  const contextText = retrievedDocs.map(d => `[${d.clause_label}]: ${d.content}`).join('\n\n');
-  const langName = language === 'hi' ? 'Hindi' : language === 'te' ? 'Telugu' : 'English';
-
-  // 1. Try Groq API (High Performance Llama 3.3 70B)
-  if (groqKey) {
-    try {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${groqKey}`
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            { role: 'system', content: `You are Sahayak, an official AI assistant for Indian Central and State government schemes. Answer the user's question clearly and helpfully in ${langName} based strictly on the official clauses provided. Do not hallucinate.` },
-            { role: 'user', content: `Clauses:\n${contextText}\n\nQuestion: ${query}` }
-          ],
-          temperature: 0.3
-        })
-      });
-      if (response.ok) {
-        const data = await response.json();
-        const content = data.choices[0]?.message?.content;
-        if (content) return content;
-      } else {
-        console.warn('Groq API failed:', response.status, await response.text());
-      }
-    } catch (err) {
-      console.warn('Groq LLM call exception:', err);
-    }
-  }
-  if (geminiKey) {
-    try {
-      const endpointsToTry = [
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiKey}`,
-        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${geminiKey}`
-      ];
-
-      let isQuotaExceeded = false;
-
-      for (const url of endpointsToTry) {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ 
-              parts: [{ 
-                text: `You are Sahayak, an official AI assistant for Indian Central and State government schemes. Answer the user's question in ${langName} in a friendly, conversational manner based strictly on these official clauses:\n\n${contextText}\n\nUser Question: ${query}` 
-              }] 
-            }]
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const answerText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (answerText) return answerText;
-        } else {
-          if (response.status === 429) {
-            isQuotaExceeded = true;
-            console.warn('Gemini API Quota Exceeded (HTTP 429).');
-          }
-          const errText = await response.text();
-          console.warn(`Gemini API call failed (${url.split('?')[0]}):`, response.status, errText);
-        }
-      }
-
-      if (isQuotaExceeded) {
-        console.warn("Gemini API key has exceeded Google AI Studio free tier quota (HTTP 429).");
-      }
-    } catch (err) {
-      console.warn('Gemini LLM call exception:', err);
-    }
-  }
-
-  // 2. Try OpenAI API
-  if (openAiKey) {
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${openAiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: `You are Sahayak, an official AI assistant for Indian Central and State government schemes. Answer clearly in ${langName}. Base your answer strictly on the official clauses provided. Do not hallucinate.` },
-            { role: 'user', content: `Clauses:\n${contextText}\n\nQuestion: ${query}` }
-          ],
-          temperature: 0.3
-        })
-      });
-      if (response.ok) {
-        const data = await response.json();
-        return data.choices[0]?.message?.content;
-      } else {
-        console.warn('OpenAI API failed:', response.status, await response.text());
-      }
-    } catch (err) {
-      console.warn('OpenAI LLM call exception:', err);
-    }
-  }
-
-  // 3. Try Groq API
-  if (groqKey) {
-    try {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${groqKey}`
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            { role: 'system', content: `You are Sahayak, an official AI assistant for Indian Central and State government schemes. Answer in ${langName} based strictly on the clauses provided.` },
-            { role: 'user', content: `Clauses:\n${contextText}\n\nQuestion: ${query}` }
-          ],
-          temperature: 0.3
-        })
-      });
-      if (response.ok) {
-        const data = await response.json();
-        return data.choices[0]?.message?.content;
-      } else {
-        console.warn('Groq API failed:', response.status, await response.text());
-      }
-    } catch (err) {
-      console.warn('Groq LLM call exception:', err);
-    }
-  }
-
-  return null;
+  const denom = Math.sqrt(normA) * Math.sqrt(normB);
+  return denom === 0 ? 0 : dot / denom;
 }
 
-export async function processGroundedRAGQuery(
-  query,
-  schemeId,
-  language = 'en'
-) {
-  try {
-    // 1. Fetch the fully-formed response from the new secure backend
-    // In production, this would be: 
-    // const response = await fetch('/api/rag/search', { ... })
-    // return await response.json();
-    
-    const backendResponse = await simulateBackendRagSearch(query, schemeId, language);
-    return backendResponse;
+// ── OpenAI: single embedding ───────────────────────────────────────────────────
+async function createEmbedding(text) {
+  const res = await fetch('https://api.openai.com/v1/embeddings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_API_KEY}` },
+    body: JSON.stringify({ model: EMBEDDING_MODEL, input: text.slice(0, 8192) }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`OpenAI Embeddings error ${res.status}: ${err?.error?.message || 'unknown'}`);
+  }
+  return (await res.json()).data[0].embedding;
+}
 
-  } catch (error) {
-    console.error("RAG Frontend Service Error:", error);
-    return { 
-      responseText: "Error connecting to the government database. Please try again later.", 
-      citations: [], 
-      confidenceScore: 0,
+// ── OpenAI: batch embed all docs for a state ──────────────────────────────────
+async function ensureStateEmbeddings(stateId, docs) {
+  if (_embeddingCache.has(stateId)) return _embeddingCache.get(stateId);
+
+  const texts = docs.map(d => `${d.clause_label}: ${d.content}`.slice(0, 8192));
+  const res = await fetch('https://api.openai.com/v1/embeddings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_API_KEY}` },
+    body: JSON.stringify({ model: EMBEDDING_MODEL, input: texts }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`OpenAI batch embed error ${res.status}: ${err?.error?.message || 'unknown'}`);
+  }
+  const data = await res.json();
+  const cached = docs.map((doc, i) => ({ doc, embedding: data.data[i].embedding }));
+  _embeddingCache.set(stateId, cached);
+  return cached;
+}
+
+// ── OpenAI: grounded answer generation ───────────────────────────────────────
+const LANG_INSTRUCTIONS = {
+  en: 'Respond in English.',
+  hi: 'Respond in Hindi (हिंदी).',
+  te: 'Respond in Telugu (తెలుగు).',
+  mr: 'Respond in Marathi (मराठी).',
+  kn: 'Respond in Kannada (ಕನ್ನಡ).',
+  ta: 'Respond in Tamil (தமிழ்).',
+  ml: 'Respond in Malayalam (മലയാളം).',
+  gu: 'Respond in Gujarati (ગુજરાતી).',
+  bn: 'Respond in Bengali (বাংলা).',
+  pa: 'Respond in Punjabi (ਪੰਜਾਬੀ).',
+  or: 'Respond in Odia (ଓଡ଼ିଆ).',
+  as: 'Respond in Assamese (অসমীয়া).',
+};
+
+async function generateAnswer(query, retrievedClauses, language = 'en') {
+  const context = retrievedClauses
+    .map((c, i) => `[Clause ${i + 1} — ${c.clause_label}]\n${c.content}`)
+    .join('\n\n');
+
+  const systemPrompt = `You are Sahayak, an AI assistant that helps Indian citizens understand government welfare schemes.
+Rules:
+- Ground every answer strictly in the provided clause excerpts below.
+- Use plain language accessible to first-time readers.
+- If the clauses do not fully answer the question, say so honestly.
+- Never invent eligibility criteria, amounts, or deadlines not present in the context.
+${LANG_INSTRUCTIONS[language] || LANG_INSTRUCTIONS.en}
+
+Official Government Clauses:
+${context}`;
+
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_API_KEY}` },
+    body: JSON.stringify({
+      model: CHAT_MODEL,
+      messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: query }],
+      temperature: 0.2,
+      max_tokens: 500,
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`OpenAI Chat error ${res.status}: ${err?.error?.message || 'unknown'}`);
+  }
+  return (await res.json()).choices[0].message.content.trim();
+}
+
+async function generateAnswerViaGroq(query, retrievedClauses, language = 'en') {
+  const context = retrievedClauses
+    .map((c, i) => `[Clause ${i + 1} — ${c.clause_label}]\n${c.content}`)
+    .join('\n\n');
+
+  const systemPrompt = `You are Sahayak, an AI assistant that helps Indian citizens understand government welfare schemes.
+Rules:
+- Ground every answer strictly in the provided clause excerpts below.
+- Use plain language accessible to first-time readers.
+- If the clauses do not fully answer the question, say so honestly.
+- Never invent eligibility criteria, amounts, or deadlines not present in the context.
+${LANG_INSTRUCTIONS[language] || LANG_INSTRUCTIONS.en}
+
+Official Government Clauses:
+${context}`;
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: query }],
+      temperature: 0.2,
+      max_tokens: 500,
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Groq Chat error ${res.status}: ${err?.error?.message || 'unknown'}`);
+  }
+  return (await res.json()).choices[0].message.content.trim();
+}
+
+// ── Keyword-matching fallback ─────────────────────────────────────────────────
+function keywordScore(query, text) {
+  const qTokens = query.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(Boolean);
+  const tTokens = new Set(text.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(Boolean));
+  if (!qTokens.length || !tTokens.size) return 0;
+  let matches = 0;
+  for (const t of qTokens) {
+    if (tTokens.has(t) || [...tTokens].some(s => s.includes(t) || t.includes(s))) matches++;
+  }
+  return Math.min(0.95, (matches / qTokens.length) * 1.1);
+}
+
+function fallbackText(scheme, score, language) {
+  const link = scheme?.official_link || 'https://india.gov.in/topics/social-welfare';
+  const pct = Math.round(score * 100);
+  const msgs = {
+    en: `Based on the retrieved official clauses, I am not fully certain about this query (confidence: ${pct}%). For accurate information please visit: ${link}`,
+    hi: `आधिकारिक धाराओं के आधार पर, मैं इस प्रश्न के बारे में पूरी तरह आश्वस्त नहीं हूँ (विश्वास: ${pct}%)। कृपया आधिकारिक पोर्टल पर जाएँ: ${link}`,
+    te: `అధికారిక నిబంధనల ఆధారంగా ఈ ప్రశ్నకు ఖచ్చితంగా సమాధానం ఇవ్వలేకపోతోంది (నమ్మకం: ${pct}%). దయచేసి సందర్శించండి: ${link}`,
+  };
+  return msgs[language] || msgs.en;
+}
+
+// ── Main export ───────────────────────────────────────────────────────────────
+export async function processGroundedRAGQuery(query, schemeId, language = 'en', stateId = 'telangana') {
+  const { docs: allDocs, schemes, hasCorpus } = getCorpus(stateId);
+  const documents = allDocs.filter(doc => !schemeId || doc.scheme_id === schemeId);
+  const targetScheme = schemes.find(s => s.id === schemeId) || schemes[0];
+
+  // ── Path A1: Real Groq RAG (Keyword retrieval + Groq LLM) ──────────────────
+  if (isGroqConfigured) {
+    try {
+      const docsToSearch = documents.length > 0 ? documents : allDocs;
+      const scoredKw = docsToSearch
+        .map(doc => ({ doc, score: keywordScore(query, `${doc.clause_label} ${doc.content}`) }))
+        .sort((a, b) => b.score - a.score);
+
+      const topScore = scoredKw[0]?.score ?? 0;
+
+      if (topScore < CONFIDENCE_THRESHOLD || !scoredKw[0]) {
+        return {
+          responseText: fallbackText(targetScheme, topScore, language),
+          citations: scoredKw[0] ? [{
+            source_id: scoredKw[0].doc.id,
+            clause_label: scoredKw[0].doc.clause_label,
+            last_verified_at: scoredKw[0].doc.last_verified_at,
+            content_snippet: scoredKw[0].doc.content.substring(0, 160) + '...',
+          }] : [],
+          confidenceScore: topScore,
+          wasLowConfidence: true,
+          retrievedDocs: scoredKw[0] ? [scoredKw[0].doc] : [],
+          isRealAI: true,
+          aiModel: 'Llama-3.3-70b via Groq',
+          hasCorpus,
+        };
+      }
+
+      const topK = scoredKw.slice(0, TOP_K).map(x => x.doc);
+      const responseText = await generateAnswerViaGroq(query, topK, language);
+
+      return {
+        responseText,
+        citations: topK.map(doc => ({
+          source_id: doc.id,
+          clause_label: doc.clause_label,
+          last_verified_at: doc.last_verified_at,
+          content_snippet: doc.content,
+        })),
+        confidenceScore: topScore,
+        wasLowConfidence: false,
+        retrievedDocs: topK,
+        isRealAI: true,
+        aiModel: 'Llama-3.3-70b via Groq',
+        hasCorpus,
+      };
+    } catch (err) {
+      console.error('[RAG] Groq error, falling back to basic keyword matching:', err.message);
+    }
+  }
+
+  // ── Path A2: Real OpenAI RAG ────────────────────────────────────────────────
+  if (isOpenAIConfigured) {
+    try {
+      const [queryEmbedding, docEmbeddings] = await Promise.all([
+        createEmbedding(query),
+        ensureStateEmbeddings(stateId, documents.length > 0 ? documents : allDocs),
+      ]);
+
+      // Filter cached embeddings to only docs relevant to this query scope
+      const relevantEmbeddings = documents.length > 0
+        ? docEmbeddings.filter(({ doc }) => !schemeId || doc.scheme_id === schemeId)
+        : docEmbeddings;
+
+      const scored = relevantEmbeddings
+        .map(({ doc, embedding }) => ({ doc, score: cosineSimilarity(queryEmbedding, embedding) }))
+        .sort((a, b) => b.score - a.score);
+
+      const topScore = scored[0]?.score ?? 0;
+
+      if (topScore < CONFIDENCE_THRESHOLD || !scored[0]) {
+        return {
+          responseText: fallbackText(targetScheme, topScore, language),
+          citations: scored[0] ? [{
+            source_id: scored[0].doc.id,
+            clause_label: scored[0].doc.clause_label,
+            last_verified_at: scored[0].doc.last_verified_at,
+            content_snippet: scored[0].doc.content.substring(0, 160) + '...',
+          }] : [],
+          confidenceScore: topScore,
+          wasLowConfidence: true,
+          retrievedDocs: scored[0] ? [scored[0].doc] : [],
+          isRealAI: true,
+          aiModel: 'GPT-4o-mini',
+          hasCorpus,
+        };
+      }
+
+      const topK = scored.slice(0, TOP_K);
+      const responseText = await generateAnswer(query, topK.map(x => x.doc), language);
+
+      return {
+        responseText,
+        citations: topK.map(({ doc }) => ({
+          source_id: doc.id,
+          clause_label: doc.clause_label,
+          last_verified_at: doc.last_verified_at,
+          content_snippet: doc.content,
+        })),
+        confidenceScore: topScore,
+        wasLowConfidence: false,
+        retrievedDocs: topK.map(x => x.doc),
+        isRealAI: true,
+        aiModel: 'GPT-4o-mini',
+        hasCorpus,
+      };
+    } catch (err) {
+      console.error('[RAG] OpenAI error, falling back to keyword matching:', err.message);
+    }
+  }
+
+  // ── Path B: Keyword fallback ──────────────────────────────────────────────
+  const docsToSearch = documents.length > 0 ? documents : allDocs;
+  const scoredKw = docsToSearch
+    .map(doc => ({ doc, score: keywordScore(query, `${doc.clause_label} ${doc.content}`) }))
+    .sort((a, b) => b.score - a.score);
+
+  const topKw = scoredKw[0];
+  const topScore = topKw?.score ?? 0;
+
+  if (topScore < CONFIDENCE_THRESHOLD || !topKw) {
+    return {
+      responseText: fallbackText(targetScheme, topScore, language),
+      citations: topKw ? [{
+        source_id: topKw.doc.id,
+        clause_label: topKw.doc.clause_label,
+        last_verified_at: topKw.doc.last_verified_at,
+        content_snippet: topKw.doc.content.substring(0, 120) + '...',
+      }] : [],
+      confidenceScore: topScore,
       wasLowConfidence: true,
-      retrievedDocs: []
+      retrievedDocs: topKw ? [topKw.doc] : [],
+      isRealAI: false,
+      hasCorpus,
     };
   }
+
+  const top2 = scoredKw.slice(0, 2).map(x => x.doc);
+  const msgs = {
+    hi: `आधिकारिक दिशा-निर्देशों के अनुसार (${top2[0].clause_label}): ${top2[0].content}`,
+    te: `అధికారిక నిబంధనల ప్రకారం (${top2[0].clause_label}): ${top2[0].content}`,
+  };
+
+  return {
+    responseText: msgs[language] || `According to official guidelines (${top2[0].clause_label}): ${top2[0].content}`,
+    citations: top2.map(doc => ({
+      source_id: doc.id,
+      clause_label: doc.clause_label,
+      last_verified_at: doc.last_verified_at,
+      content_snippet: doc.content,
+    })),
+    confidenceScore: topScore,
+    wasLowConfidence: false,
+    retrievedDocs: top2,
+    isRealAI: false,
+    hasCorpus,
+  };
+}
+
+/** Clear per-state embedding cache (call when user switches state) */
+export function clearEmbeddingCache(stateId) {
+  if (stateId) _embeddingCache.delete(stateId);
+  else _embeddingCache.clear();
 }

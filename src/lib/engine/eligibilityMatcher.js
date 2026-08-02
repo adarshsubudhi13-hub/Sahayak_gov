@@ -1,5 +1,7 @@
+import { TELANGANA_SCHEMES, TELANGANA_ELIGIBILITY_RULES } from '../seed/telanganaSchemes.js';
+
 export function evaluateRule(rule, profile) {
-  const profileVal = profile[rule.field_key];
+  const profileVal = profile[rule.field];
 
   if (profileVal === undefined || profileVal === null) {
     return false;
@@ -34,49 +36,66 @@ export function evaluateRule(rule, profile) {
 
 export function matchProfileAgainstSchemes(
   profile,
-  schemes = []
+  schemes = TELANGANA_SCHEMES,
+  rules = TELANGANA_ELIGIBILITY_RULES
 ) {
+  const LANG_CODES = ['en', 'hi', 'te', 'mr', 'kn', 'ta', 'ml', 'gu', 'bn', 'pa', 'or', 'as'];
+
   return schemes.map(scheme => {
-    const schemeRules = scheme.rules || [];
+    const schemeRules = rules.filter(r => r.scheme_id === scheme.id);
 
     if (schemeRules.length === 0) {
+      const defaultReasons = {};
+      LANG_CODES.forEach(lang => {
+        defaultReasons[lang] = [
+          `Open to all residents of ${scheme.state || 'India'}.`
+        ];
+      });
       return {
         scheme,
         is_eligible: true,
-        match_reasons: {
-          en: ['Open to all residents.'],
-          hi: ['सभी निवासियों के लिए खुला है।'],
-          te: ['పౌరులందరికీ అందుబాటులో ఉంది.']
-        },
+        match_reasons: defaultReasons,
         passed_rules_count: 1,
         total_rules_count: 1
       };
     }
 
-    const passedReasonsEn = [];
-    const passedReasonsHi = [];
-    const passedReasonsTe = [];
+    const passedReasonsByLang = {};
+    LANG_CODES.forEach(lang => {
+      passedReasonsByLang[lang] = [];
+    });
+
     let passedCount = 0;
 
     for (const rule of schemeRules) {
       if (evaluateRule(rule, profile)) {
         passedCount++;
-        passedReasonsEn.push(rule.match_reason_default);
-        passedReasonsHi.push(rule.translations?.hi?.match_reason || rule.match_reason_default);
-        passedReasonsTe.push(rule.translations?.te?.match_reason || rule.match_reason_default);
+        const fallbackReason = rule.match_reason_en || rule.match_reason_hi || 'Meets eligibility criteria.';
+        
+        LANG_CODES.forEach(lang => {
+          const reasonForLang = rule[`match_reason_${lang}`] || fallbackReason;
+          if (reasonForLang) {
+            passedReasonsByLang[lang].push(reasonForLang);
+          }
+        });
       }
     }
 
-    const isEligible = passedCount > 0 && passedCount >= schemeRules.filter(r => r.is_mandatory).length;
+    // Ensure no empty language array
+    LANG_CODES.forEach(lang => {
+      if (passedReasonsByLang[lang].length === 0) {
+        passedReasonsByLang[lang] = [
+          passedReasonsByLang['en'][0] || `Meets basic ${scheme.state || ''} residency criteria.`
+        ];
+      }
+    });
+
+    const isEligible = passedCount > 0;
 
     return {
       scheme,
       is_eligible: isEligible,
-      match_reasons: {
-        en: passedReasonsEn.length > 0 ? passedReasonsEn : ['Meets basic criteria.'],
-        hi: passedReasonsHi.length > 0 ? passedReasonsHi : ['बुनियादी मानदंडों को पूरा करता है।'],
-        te: passedReasonsTe.length > 0 ? passedReasonsTe : ['ప్రాథమిక సూత్రాలకు కట్టుబడి ఉంది.']
-      },
+      match_reasons: passedReasonsByLang,
       passed_rules_count: passedCount,
       total_rules_count: schemeRules.length
     };

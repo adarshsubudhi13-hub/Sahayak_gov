@@ -83,10 +83,12 @@ graph TD
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [React 18](https://react.dev/) + [Vite](https://vitejs.dev/)
-- **Styling**: [Tailwind CSS v3](https://tailwindcss.com/)
+- **Frontend**: [React 18](https://react.dev/) + [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS v3](https://tailwindcss.com/), PostCSS, Autoprefixer
 - **Routing**: [React Router v6](https://reactrouter.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
+- **Backend & Database**: [Supabase](https://supabase.com/) (`@supabase/supabase-js`)
+- **AI Integration**: [OpenAI SDK](https://github.com/openai/openai-node) (compatible with OpenAI and Groq APIs)
+- **Icons & UI Utilities**: [Lucide React](https://lucide.dev/), `clsx`, `tailwind-merge`
 - **Language**: Pure JavaScript (ES6+) and JSX (No TypeScript)
 
 ---
@@ -124,7 +126,7 @@ Make sure you have [Node.js](https://nodejs.org/) (v18 or higher) and npm instal
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/saswatdutta1310/Sahayak_gov.git
+   git clone https://github.com/adarshsubudhi13-hub/Sahayak_gov.git
    cd Sahayak_gov
    ```
 
@@ -140,6 +142,18 @@ Make sure you have [Node.js](https://nodejs.org/) (v18 or higher) and npm instal
 
 4. **Open in Browser**
    Navigate to `http://localhost:5173/` to view the application.
+
+---
+
+## 🌐 Deploy to Vercel
+
+You can deploy Sahayak to [Vercel](https://vercel.com/) with zero configuration using the included [`vercel.json`](file:///c:/Users/adars/Downloads/Sahayak_gov-main/vercel.json):
+
+1. **Push your code** to GitHub, GitLab, or Bitbucket.
+2. Import the repository in your [Vercel Dashboard](https://vercel.com/new).
+3. **Environment Variables**: Add `VITE_GROQ_API_KEY` under Project Settings -> Environment Variables.
+4. Click **Deploy**. Vercel will automatically build the Vite production bundle and handle client-side routing.
+
 
 ---
 

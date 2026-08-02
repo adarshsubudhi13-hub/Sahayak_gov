@@ -1,0 +1,156 @@
+export const WESTBENGAL_SCHEMES = [
+  {
+    id: 'wb-kanyashree',
+    name_en: 'Kanyashree Prakalpa',
+    name_hi: 'कन्याश्री प्रकल्प',
+    name_bn: 'কন্যাશ્રી પ્રકલ્પ',
+    description_en: '₹25,000 grant for girls who avoid child marriage and continue education.',
+    description_hi: 'बाल विवाह से बचने और शिक्षा जारी रखने वाली लड़कियों के लिए ₹25,000 का अनुदान।',
+    description_bn: 'બાળ લગ્ન ટાળનાર અને શિક્ષણ ચાલુ રાખનાર છોકરીઓ માટે ₹25,000 અનુદાન.',
+    category: 'womens_welfare',
+    issuing_department: 'Women and Child Development, WB',
+    benefits_en: 'One-time ₹25,000 grant and annual scholarship.',
+    benefits_hi: 'एकमुश्त ₹25,000 अनुदान और वार्षिक छात्रवृत्ति।',
+    benefits_bn: 'એક વખતનું ₹25,000 અનુદાન અને વાર્ષિક શિષ્યવૃત્તિ.',
+    official_link: 'https://wbkanyashree.gov.in/',
+    deadline: null,
+    state: 'West Bengal',
+    last_verified_at: '2026-07-25',
+    required_documents: []
+  },
+  {
+    id: 'wb-rupashree',
+    name_en: 'Rupashree Prakalpa',
+    name_hi: 'रूपश्री प्रकल्प',
+    name_bn: 'રૂપશ્રી પ્રકલ્પ',
+    description_en: '₹25,000 one-time marriage grant for economically backward women.',
+    description_hi: 'आर्थिक रूप से पिछड़े वर्ग की महिलाओं के लिए ₹25,000 का एकमुश्त विवाह अनुदान।',
+    description_bn: 'આર્થિક રીતે પછાત મહિલાઓ માટે ₹25,000 એક વખતનું લગ્ન અનુદાન.',
+    category: 'womens_welfare',
+    issuing_department: 'Women and Child Development, WB',
+    benefits_en: '₹25,000 financial assistance for marriage.',
+    benefits_hi: 'विवाह के लिए ₹25,000 की वित्तीय सहायता।',
+    benefits_bn: 'લગ્ન માટે ₹25,000 નાણાકીય સહાય.',
+    official_link: 'https://wbrupashree.gov.in/',
+    deadline: null,
+    state: 'West Bengal',
+    last_verified_at: '2026-07-25',
+    required_documents: []
+  },
+  {
+    id: 'wb-bina-mulye-samajik-suraksha',
+    name_en: 'Swasthya Sathi',
+    name_hi: 'स्वास्थ्य साथी',
+    name_bn: 'સ્વાસ્થ્ય સાથી',
+    description_en: 'Free cashless health insurance of ₹5 lakh per family.',
+    description_hi: 'प्रति परिवार ₹5 लाख का मुफ्त कैशलेस स्वास्थ्य बीमा।',
+    description_bn: 'દરેક પરિવાર દીઠ ₹5 લાખનો મફત કેશલેસ આરોગ્ય વીમો.',
+    category: 'healthcare',
+    issuing_department: 'Health and Family Welfare, WB',
+    benefits_en: 'Coverage up to ₹5 lakh per annum per family.',
+    benefits_hi: 'प्रति परिवार प्रति वर्ष ₹5 लाख तक का कवरेज।',
+    benefits_bn: 'પરિવાર દીઠ વાર્ષિક ₹5 લાખ સુધીનું કવરેજ.',
+    official_link: 'https://swasthyasathi.gov.in/',
+    deadline: null,
+    state: 'West Bengal',
+    last_verified_at: '2026-07-25',
+    required_documents: []
+  },
+  {
+    id: 'wb-krishak-bandhu',
+    name_en: 'Krishak Bandhu',
+    name_hi: 'कृषक बंधु',
+    name_bn: 'કૃષક બંધુ',
+    description_en: '₹10,000 per acre per year financial assistance for farmers.',
+    description_hi: 'किसानों के लिए प्रति एकड़ प्रति वर्ष ₹10,000 की वित्तीय सहायता।',
+    description_bn: 'ખેડૂતો માટે એકર દીઠ વાર્ષિક ₹10,000 નાણાકીય સહાય.',
+    category: 'farmer_subsidy',
+    issuing_department: 'Agriculture Dept, WB',
+    benefits_en: 'Direct benefit transfer for farming inputs.',
+    benefits_hi: 'खेती के लिए सीधे लाभ हस्तांतरण।',
+    benefits_bn: 'ખેતી માટે સીધો લાભ હસ્તાંતરણ.',
+    official_link: 'https://krishakbandhu.net/',
+    deadline: null,
+    state: 'West Bengal',
+    last_verified_at: '2026-07-25',
+    required_documents: []
+  },
+  {
+    id: 'wb-yuva-shree',
+    name_en: 'Yuva Shree',
+    name_hi: 'युवा श्री',
+    name_bn: 'યુવા શ્રી',
+    description_en: '₹1500/month unemployment allowance for enrolled youth.',
+    description_hi: 'नामांकित युवाओं के लिए ₹1500/माह बेरोजगारी भत्ता।',
+    description_bn: 'નોંધાયેલા યુવાનો માટે ₹1500/મહિને બેરોજગારી ભથ્થું.',
+    category: 'employment',
+    issuing_department: 'Labour Dept, WB',
+    benefits_en: 'Monthly allowance until employed.',
+    benefits_hi: 'रोजगार मिलने तक मासिक भत्ता।',
+    benefits_bn: 'રોજગાર ન મળે ત્યાં સુધી માસિક ભથ્થું.',
+    official_link: 'https://employmentbankwb.gov.in/',
+    deadline: null,
+    state: 'West Bengal',
+    last_verified_at: '2026-07-25',
+    required_documents: []
+  },
+  {
+    id: 'wb-lakshmir-bhandar',
+    name_en: 'Lakshmir Bhandar',
+    name_hi: 'लक्ष्मी भंडार',
+    name_bn: 'લક્ષ્મી ભંડાર',
+    description_en: '₹500-1000/month basic income support for female heads of household.',
+    description_hi: 'महिला मुखिया के लिए ₹500-1000/माह की बुनियादी आय सहायता।',
+    description_bn: 'મહિલા ઘરના વડા માટે ₹500-1000/મહિને મૂળભૂત આવક સહાય.',
+    category: 'womens_welfare',
+    issuing_department: 'Women and Child Development, WB',
+    benefits_en: 'Monthly DBT for empowerment.',
+    benefits_hi: 'सशक्तिकरण के लिए मासिक डीबीटी।',
+    benefits_bn: 'સશક્તિકરણ માટે માસિક DBT.',
+    official_link: 'https://wb.gov.in/',
+    deadline: null,
+    state: 'West Bengal',
+    last_verified_at: '2026-07-25',
+    required_documents: []
+  }
+];
+
+export const WESTBENGAL_ELIGIBILITY_RULES = [
+  {
+    id: 'rule-wb-lakshmir',
+    scheme_id: 'wb-lakshmir-bhandar',
+    field: 'gender',
+    operator: 'equals',
+    value: 'female',
+    match_reason_en: 'Scheme provides support for female household heads.',
+    match_reason_hi: 'योजना महिला मुखिया को सहायता प्रदान करती है।',
+    match_reason_bn: 'આ યોજના મહિલા વડા માટે સહાય પૂરી પાડે છે.'
+  }
+];
+
+export const WESTBENGAL_RAG_DOCUMENTS = [
+  {
+    id: 'doc-wb-kanyashree-clause-1',
+    scheme_id: 'wb-kanyashree',
+    clause_label: 'Kanyashree Prakalpa — Annual Stipend & One-Time Grant Eligibility',
+    content: 'Kanyashree Prakalpa provides ₹1,000 annual stipend (K-1) to girls aged 13-18 years studying in Classes 8 to 12 in recognised schools with family income below ₹1,20,000 per year. A one-time grant of ₹25,000 (K-2) is given to girls who remain unmarried and enrolled in education at 18 years. Applications submitted through school headmasters to Block Development Offices.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-wb-krishak-clause-1',
+    scheme_id: 'wb-krishak-bandhu',
+    clause_label: 'Krishak Bandhu — Annual Benefit & Eligibility Criteria',
+    content: 'West Bengal Krishak Bandhu provides ₹10,000 per year per acre (minimum ₹4,000 for holdings below 1 acre) to all farmers including bargadars (sharecroppers) recorded in the Bargadar Register. Additionally, a death benefit of ₹2 lakh is paid to the farmer family upon death of the beneficiary. Applications are registered through the e-District portal.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-wb-rupashree-clause-1',
+    scheme_id: 'wb-rupashree',
+    clause_label: 'Rupashree Prakalpa — Marriage Assistance Amount & Conditions',
+    content: 'West Bengal Rupashree Prakalpa provides a one-time grant of ₹25,000 to families for the marriage of their daughter. The family annual income must not exceed ₹1,50,000. The bride must be at least 18 years old and the groom at least 21 years. Application is submitted one to 60 days before the proposed marriage date through BDO or SDO office.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];
