@@ -348,66 +348,6 @@ export const TELANGANA_SCHEMES = [
         issuing_authority: 'Aarogyasri Health Trust'
       }
     ]
-  },
-  {
-    id: 'pm-kisan',
-    name_en: 'Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)',
-    name_hi: 'प्रधानमंत्री किसान सम्मान निधि (PM-KISAN)',
-    name_te: 'ప్రధాన మంత్రి కిసాన్ సమ్మాన్ నిధి (PM-KISAN)',
-    description_en: 'Central Sector Scheme providing income support of ₹6,000 per year in three equal installments of ₹2,000 directly to landholding farmer families across India.',
-    description_hi: 'भारत भर के भूमिधारक किसान परिवारों को ₹2,000 की तीन समान किश्तों में प्रति वर्ष ₹6,000 की आय सहायता प्रदान करने वाली केंद्रीय क्षेत्र योजना।',
-    description_te: 'భారతదేశవ్యాప్తంగా ఉన్న రైతు కుటుంబాలకు సంవత్సరానికి రూ. 6,000 ఆదాయ సహాయాన్ని 3 విడతలలో నేరుగా బ్యాంకు ఖాతాలో జమ చేసే కేంద్ర ప్రభుత్వ పథకం.',
-    category: 'farmer_subsidy',
-    issuing_department: 'Ministry of Agriculture and Farmers Welfare, Govt of India',
-    benefits_en: '₹6,00,0 per year direct benefit transfer (DBT) into Aadhaar-seeded bank accounts.',
-    benefits_hi: 'आधार से जुड़े बैंक खातों में प्रति वर्ष ₹6,000 का प्रत्यक्ष लाभ हस्तांतरण (डीबीटी)।',
-    benefits_te: 'ఆధార్ అనుసంధానిత బ్యాంక్ ఖాతాలలోకి సంవత్సరానికి రూ. 6,000 నేరుగా జమ.',
-    official_link: 'https://pmkisan.gov.in/',
-    deadline: null,
-    state: 'Central / All India',
-    last_verified_at: '2026-07-10',
-    required_documents: [
-      {
-        key: 'pm_kisan_aadhaar',
-        name_en: 'Aadhaar Card (eKYC Verified)',
-        name_hi: 'आधार कार्ड (eKYC सत्यापित)',
-        name_te: 'ఆధార్ కార్డ్ (eKYC పూర్తి చేసినది)',
-        helper_text_en: 'Mandatory eKYC completed on PM-KISAN portal.',
-        helper_text_hi: 'पीएम-किसान पोर्टल पर अनिवार्य ई-केवाईसी पूर्ण।',
-        helper_text_te: 'PM-KISAN పోర్టల్‌లో eKYC పూర్తి చేసి ఉండాలి.',
-        issuing_authority: 'UIDAI / PM-KISAN Portal'
-      }
-    ]
-  },
-  {
-    id: 'pm-jay-ayushman',
-    name_en: 'Ayushman Bharat Pradhan Mantri Jan Arogya Yojana (PM-JAY)',
-    name_hi: 'आयुष्मान भारत प्रधानमंत्री जन आरोग्य योजना (PM-JAY)',
-    name_te: 'ఆయుష్మాన్ భారత్ ప్రధాన మంత్రి జన్ ఆరోగ్య యోజన (PM-JAY)',
-    description_en: 'World’s largest health assurance scheme providing a health cover of ₹5 Lakh per family per year for secondary and tertiary care hospitalization to over 12 crore poor and vulnerable families across India.',
-    description_hi: 'भारत भर में 12 करोड़ से अधिक गरीब और वंचित परिवारों को द्वितीयक और तृतीयक देखभाल अस्पताल में भर्ती के लिए प्रति वर्ष प्रति परिवार ₹5 लाख का स्वास्थ्य कवर प्रदान करने वाली दुनिया की सबसे बड़ी स्वास्थ्य आश्वासन योजना।',
-    description_te: 'భారతదేశవ్యాప్తంగా 12 కోట్లకు పైగా పేద కుటుంబాలకు ఆసుపత్రి వైద్యం కోసం ప్రతి కుటుంబానికి సంవత్సరానికి రూ. 5 లక్షల ఉచిత ఆరోగ్య భద్రత కల్పించే పథకం.',
-    category: 'healthcare',
-    issuing_department: 'National Health Authority (NHA), Govt of India',
-    benefits_en: '₹5,00,000 cashless health insurance per family per year in empaneled hospitals nationwide.',
-    benefits_hi: 'देशभर के सूचीबद्ध अस्पतालों में प्रति परिवार प्रति वर्ष ₹5,00,000 का कैशलेस स्वास्थ्य बीमा।',
-    benefits_te: 'దేశమంతటా ఎంప్యానెల్ చేయబడిన ఆసుపత్రులలో ఉచిత నగదు రహిత చికిత్స.',
-    official_link: 'https://pmjay.gov.in/',
-    deadline: null,
-    state: 'Central / All India',
-    last_verified_at: '2026-07-12',
-    required_documents: [
-      {
-        key: 'ayushman_card',
-        name_en: 'Ayushman Bharat Golden Card / SECC Data Verification',
-        name_hi: 'आयुष्मान भारत गोल्डन कार्ड / एसईसीसी डेटा सत्यापन',
-        name_te: 'ఆయుష్మాన్ భారత్ గోల్డెన్ కార్డ్ / SECC ధృవీకరణ',
-        helper_text_en: 'e-Card generated via Ayushman app or Common Service Centre (CSC).',
-        helper_text_hi: 'आयुष्मान ऐप या सीएससी के माध्यम से उत्पन्न ई-कार्ड।',
-        helper_text_te: 'CSC సెంటర్ లేదా ఆయుష్మాన్ యాప్ ద్వారా పొందిన ఇ-కార్డ్.',
-        issuing_authority: 'National Health Authority'
-      }
-    ]
   }
 ];
 
@@ -606,21 +546,5 @@ export const TELANGANA_RAG_DOCUMENTS = [
     content: 'Rajiv Aarogyasri health scheme offers cashless inpatient treatment up to ₹10,00,000 per family per year in empaneled government and private super-specialty hospitals. White ration card holders are automatically covered for 1,670 medical and surgical procedures without out-of-pocket expenditure.',
     language: 'en',
     last_verified_at: '2026-07-05'
-  },
-  {
-    id: 'doc-pmkisan-clause-1',
-    scheme_id: 'pm-kisan',
-    clause_label: 'PM-KISAN Scheme Guidelines — ₹6,000 Annual Direct Income Support',
-    content: 'Under PM-KISAN, all landholding farmer families across India are provided financial benefit of ₹6,000 per year in three equal installments of ₹2,000 every four months. Payments are transferred directly into the bank accounts of beneficiaries via Aadhaar-based Direct Benefit Transfer (DBT).',
-    language: 'en',
-    last_verified_at: '2026-07-10'
-  },
-  {
-    id: 'doc-pmjay-clause-1',
-    scheme_id: 'pm-jay-ayushman',
-    clause_label: 'Ayushman Bharat (PM-JAY) Guidelines — ₹5 Lakh Cashless Family Cover',
-    content: 'Ayushman Bharat PM-JAY provides cashless and paperless health cover of ₹5,00,000 per family per year for secondary and tertiary care hospitalization in empaneled public and private hospitals across India. There is no restriction on family size or age, covering pre and post hospitalization expenses.',
-    language: 'en',
-    last_verified_at: '2026-07-12'
   }
 ];

@@ -1,0 +1,166 @@
+export const ODISHA_SCHEMES = [
+  {
+    id: 'od-biju-swasthya-kalyan',
+    name_en: 'Biju Swasthya Kalyan Yojana',
+    name_hi: 'बीजू स्वास्थ्य कल्याण योजना',
+    name_or: 'ବିଜୁ ସ୍ଵାସ୍ଥ୍ୟ କଲ୍ୟାଣ ଯୋଜନା',
+    description_en: '₹5 lakh health insurance (₹10 lakh for women) in Odisha.',
+    description_hi: 'ओडिशा में ₹5 लाख का स्वास्थ्य बीमा (महिलाओं के लिए ₹10 लाख)।',
+    description_or: 'ଓଡିଶାରେ ୫ ଲକ୍ଷ ଟଙ୍କାର ସ୍ଵାସ୍ଥ୍ୟ ବୀମା (ମହିଳାମାନଙ୍କ ପାଇଁ ୧୦ ଲକ୍ଷ)।',
+    category: 'healthcare',
+    issuing_department: 'Health and Family Welfare Dept, Odisha',
+    benefits_en: 'Universal health coverage in empanelled hospitals.',
+    benefits_hi: 'संबद्ध अस्पतालों में सार्वभौमिक स्वास्थ्य कवरेज।',
+    benefits_or: 'ପଞ୍ଜିକୃତ ଡାକ୍ତରଖାନାରେ ମାଗଣା ଚିକିତ୍ସା।',
+    official_link: 'https://bsky.odisha.gov.in/',
+    deadline: null,
+    state: 'Odisha',
+    last_verified_at: '2026-07-25',
+    required_documents: []
+  },
+  {
+    id: 'od-kalia',
+    name_en: 'KALIA Scheme',
+    name_hi: 'कालिया योजना',
+    name_or: 'କାଳିଆ ଯୋଜନା',
+    description_en: 'Krushak Assistance for Livelihood - ₹25,000 over 5 seasons to farmers.',
+    description_hi: 'किसानों को 5 मौसमों में ₹25,000 की सहायता।',
+    description_or: 'ଚାଷୀମାନଙ୍କୁ ୫ ଟି ଋତୁରେ ୨୫,୦୦୦ ଟଙ୍କା ସହାୟତା।',
+    category: 'farmer_subsidy',
+    issuing_department: 'Agriculture Dept, Odisha',
+    benefits_en: 'Financial assistance for cultivation.',
+    benefits_hi: 'खेती के लिए वित्तीय सहायता।',
+    benefits_or: 'ଚାଷ ପାଇଁ ଆର୍ଥିକ ସହାୟତା।',
+    official_link: 'https://kalia.odisha.gov.in/',
+    deadline: null,
+    state: 'Odisha',
+    last_verified_at: '2026-07-25',
+    required_documents: []
+  },
+  {
+    id: 'od-subhadra',
+    name_en: 'Subhadra Yojana',
+    name_hi: 'सुभद्रा योजना',
+    name_or: 'ସୁଭଦ୍ରା ଯୋଜନା',
+    description_en: '₹10,000/year for 5 years for women.',
+    description_hi: 'महिलाओं के लिए 5 वर्षों तक ₹10,000/वर्ष।',
+    description_or: 'ମହିଳାମାନଙ୍କ ପାଇଁ ୫ ବର୍ଷ ଧରି ବର୍ଷକୁ ୧୦,୦୦୦ ଟଙ୍କା।',
+    category: 'womens_welfare',
+    issuing_department: 'Women and Child Development, Odisha',
+    benefits_en: 'Direct benefit transfer for women empowerment.',
+    benefits_hi: 'महिला सशक्तिकरण के लिए सीधा लाभ हस्तांतरण।',
+    benefits_or: 'ମହିଳା ସଶକ୍ତିକରଣ ପାଇଁ ସିଧାସଳଖ ଆର୍ଥିକ ସହାୟତା।',
+    official_link: 'https://odisha.gov.in/',
+    deadline: null,
+    state: 'Odisha',
+    last_verified_at: '2026-07-25',
+    required_documents: []
+  },
+  {
+    id: 'od-madhu-babu-pension',
+    name_en: 'Madhu Babu Pension Yojana',
+    name_hi: 'मधु बाबू पेंशन योजना',
+    name_or: 'ମଧୁ ବାବୁ ପେନସନ ଯୋଜନା',
+    description_en: '₹700-900/month pension for elderly/widow/PwD.',
+    description_hi: 'बुजुर्गों/विधवाओं/दिव्यांगों के लिए ₹700-900/माह पेंशन।',
+    description_or: 'ବୃଦ୍ଧ/ବିଧବା/ଦିବ୍ୟାଙ୍ଗଙ୍କ ପାଇଁ ୭୦୦-୯୦୦ ଟଙ୍କା ମାସିକ ପେନସନ୍।',
+    category: 'pension',
+    issuing_department: 'Social Security and Empowerment of Persons with Disabilities, Odisha',
+    benefits_en: 'Social security pension.',
+    benefits_hi: 'सामाजिक सुरक्षा पेंशन।',
+    benefits_or: 'ସାମାଜିକ ସୁରକ୍ଷା ପେନସନ୍।',
+    official_link: 'https://ssepd.odisha.gov.in/',
+    deadline: null,
+    state: 'Odisha',
+    last_verified_at: '2026-07-25',
+    required_documents: []
+  },
+  {
+    id: 'od-ssd-scholarship',
+    name_en: 'Pre & Post Matric Scholarship for ST/SC',
+    name_hi: 'एसटी/एससी के लिए प्री और पोस्ट मैट्रिक छात्रवृत्ति',
+    name_or: 'ପ୍ରି ଏବଂ ପୋଷ୍ଟ ମ୍ୟାଟ୍ରିକ୍ ସ୍କଲାରସିପ୍',
+    description_en: 'Scholarships for ST/SC students in Odisha.',
+    description_hi: 'ओडिशा में एसटी/एससी छात्रों के लिए छात्रवृत्ति।',
+    description_or: 'ଓଡିଶାରେ ଏସଟି/ଏସସି ଛାତ୍ରଛାତ୍ରୀଙ୍କ ପାଇଁ ସ୍କଲାରସିପ୍।',
+    category: 'scholarship',
+    issuing_department: 'ST & SC Development Dept, Odisha',
+    benefits_en: 'Financial assistance for school and college education.',
+    benefits_hi: 'स्कूली और कॉलेज शिक्षा के लिए वित्तीय सहायता।',
+    benefits_or: 'ସ୍କୁଲ ଓ କଲେଜ ଶିକ୍ଷା ପାଇଁ ଆର୍ଥିକ ସହାୟତା।',
+    official_link: 'https://scholarship.odisha.gov.in/',
+    deadline: null,
+    state: 'Odisha',
+    last_verified_at: '2026-07-25',
+    required_documents: []
+  },
+  {
+    id: 'od-mo-ghara',
+    name_en: 'Mo Ghara Housing Scheme',
+    name_hi: 'मो घर आवास योजना',
+    name_or: 'ମୋ ଘର ଯୋଜନା',
+    description_en: 'For rural BPL families needing home repair/construction.',
+    description_hi: 'घर की मरम्मत/निर्माण के लिए ग्रामीण बीपीएल परिवारों के लिए।',
+    description_or: 'ଘର ମରାମତି/ନିର୍ମାଣ ଆବଶ୍ୟକ କରୁଥିବା ଗ୍ରାମୀଣ ବିପିଏଲ୍ ପରିବାର ପାଇଁ।',
+    category: 'housing',
+    issuing_department: 'Panchayati Raj Dept, Odisha',
+    benefits_en: 'Credit-linked housing assistance.',
+    benefits_hi: 'क्रेडिट-लिंक्ड आवास सहायता।',
+    benefits_or: 'ଋଣ-ଭିତ୍ତିକ ଗୃହ ସହାୟତା।',
+    official_link: 'https://rhodisha.gov.in/',
+    deadline: null,
+    state: 'Odisha',
+    last_verified_at: '2026-07-25',
+    required_documents: []
+  }
+];
+
+export const ODISHA_ELIGIBILITY_RULES = [
+  {
+    id: 'rule-od-subhadra',
+    scheme_id: 'od-subhadra',
+    field: 'gender',
+    operator: 'equals',
+    value: 'female',
+    match_reason_en: 'Financial assistance for women.',
+    match_reason_hi: 'महिलाओं के लिए वित्तीय सहायता।',
+    match_reason_or: 'ମହିଳାମାନଙ୍କ ପାଇଁ ଆର୍ଥିକ ସହାୟତା।'
+  },
+  {
+    id: 'rule-od-madhubabu',
+    scheme_id: 'od-madhu-babu-pension',
+    field: 'age',
+    operator: 'greater_than_or_equal',
+    value: 60,
+    match_reason_en: 'Eligible for old age pension.',
+    match_reason_hi: 'वृद्धावस्था पेंशन के लिए पात्र।',
+    match_reason_or: 'ବାର୍ଦ୍ଧକ୍ୟ ଭତ୍ତା ପାଇଁ ଯୋଗ୍ୟ।'
+  }
+];
+
+export const ODISHA_RAG_DOCUMENTS = [
+  {
+    id: 'doc-od-madhubabu-clause-1',
+    scheme_id: 'od-madhu-babu-pension',
+    clause_label: 'MBPY — Pension Amount, Eligibility Age & Categories',
+    content: 'Madhu Babu Pension Yojana provides ₹500 per month to elderly citizens aged 60 and above, widows aged 40+ without family support, and persons with 40% or more disability, all belonging to BPL families in Odisha. Enhanced pension of ₹700 per month for those aged 80 and above. Applications submitted through the Gram Panchayat or Urban Local Body office with Aadhaar, BPL card, and age proof.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-od-biju-scholarship-clause-1',
+    scheme_id: 'od-biju-swasthya-kalyan',
+    clause_label: 'Biju Swasthya Kalyan Yojana — Family Cover & Empanelled Hospitals',
+    content: 'Biju Swasthya Kalyan Yojana provides cashless medical coverage of ₹5 lakh per family per year for BPL and KALIA beneficiary families in Odisha. Women are additionally covered for up to ₹10 lakh. Coverage includes all secondary and tertiary care treatments at government and empanelled private hospitals. Smart Health Card issued to family is the access mechanism.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  },
+  {
+    id: 'doc-od-kalia-clause-1',
+    scheme_id: 'od-kalia',
+    clause_label: 'KALIA Scheme — Seasonal Assistance & Livelihood Support',
+    content: 'KALIA (Krushak Assistance for Livelihood and Income Augmentation) provides ₹10,000 financial assistance per season (Kharif and Rabi) to small and marginal farmers in Odisha for procurement of inputs. Landless agricultural labourers receive ₹12,500 per year for livelihood activities. Vulnerable agricultural households receive ₹10,000 per year for subsistence. Applications registered through Gram Panchayat.',
+    language: 'en',
+    last_verified_at: '2026-07-25'
+  }
+];

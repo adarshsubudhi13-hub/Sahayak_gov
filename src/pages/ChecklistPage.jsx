@@ -1,57 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { fetchSchemesAndRules } from '../lib/api.js';
-import { FileText, CheckCircle2, ArrowLeft, Sparkles, Loader2 } from 'lucide-react';
+import { useStateContext } from '../context/StateContext.jsx';
+import { FileText, CheckCircle2, ArrowLeft, Sparkles, MapPin } from 'lucide-react';
 
 export function ChecklistPage() {
   const { schemeId } = useParams();
   const { language, t } = useLanguage();
+  const { stateSchemes } = useStateContext();
   const [scheme, setScheme] = useState(null);
   const [collectedKeys, setCollectedKeys] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadScheme() {
+    const found = stateSchemes.find(s => s.id === schemeId);
+    setScheme(found || stateSchemes[0]);
+
+    const savedState = localStorage.getItem(`sahayak_checklist_${schemeId}`);
+    if (savedState) {
       try {
-        const response = await fetchSchemesAndRules();
-        const found = response.data.schemes.find(s => s.id === schemeId);
-        if (found) {
-          setScheme(found);
-        }
-
-        const savedState = localStorage.getItem(`sahayak_checklist_${schemeId}`);
-        if (savedState) {
-          try {
-            setCollectedKeys(JSON.parse(savedState));
-          } catch (e) {}
-        }
-      } catch (error) {
-        console.error("Error loading checklist:", error);
-      } finally {
-        setLoading(false);
-      }
+        setCollectedKeys(JSON.parse(savedState));
+      } catch (e) {}
     }
-    loadScheme();
-  }, [schemeId]);
-
-  if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-10 h-10 animate-spin text-teal-600" />
-      </div>
-    );
-  }
+  }, [schemeId, stateSchemes]);
 
   if (!scheme) {
     return (
-      <div className="flex-1 flex items-center justify-center p-6 text-center">
-        <p className="text-sm text-gray-500">Scheme not found.</p>
+      <div className="flex-1 flex items-center justify-center p-6">
+        <p className="text-sm text-gray-500">Loading checklist...</p>
       </div>
     );
   }
 
-  const schemeName = scheme.translations?.[language]?.name || scheme.name_default;
+  const schemeName = scheme[`name_${language}`] || scheme.name_hi || scheme.name_en;
 
   const toggleCheck = (key) => {
     let updated;
@@ -61,118 +41,122 @@ export function ChecklistPage() {
       updated = [...collectedKeys, key];
     }
     setCollectedKeys(updated);
-    localStorage.setItem(`sahayak_checklist_${scheme.id}`, JSON.stringify(updated));
+    localStorage.setItem(`sahayak_checklist_${schemeId}`, JSON.stringify(updated));
   };
 
-  const total = scheme.required_documents.length;
+  const docs = scheme.required_documents || [];
+  const totalCount = docs.length;
   const collectedCount = collectedKeys.length;
-  const progressPercent = total > 0 ? Math.round((collectedCount / total) * 100) : 0;
+  const progressPct = totalCount > 0 ? Math.round((collectedCount / totalCount) * 100) : 0;
 
   return (
-    <div className="flex-1 max-w-3xl w-full mx-auto py-8 px-4 sm:px-6 space-y-6">
+    <div className="flex-1 max-w-4xl w-full mx-auto py-8 px-4 sm:px-6 space-y-8">
       
       <Link
         to={`/schemes/${scheme.id}`}
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-700 hover:text-teal-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-500 rounded"
+        className="inline-flex items-center gap-2 text-xs font-bold text-gray-600 hover:text-teal-700 transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-        Back to {schemeName}
+        <ArrowLeft className="w-4 h-4" />
+        Back to Scheme Details
       </Link>
 
-      <div className="bg-white rounded-3xl border border-gray-200 p-6 sm:p-8 shadow-sm space-y-6">
+      <div className="bg-white rounded-3xl border border-gray-200 p-6 sm:p-10 shadow-lg space-y-8">
         
-        <header>
-          <span className="text-xs font-bold text-teal-700 uppercase tracking-wide">
-            Document Readiness Checklist
-          </span>
-          <h1 id="checklist-title" className="text-2xl font-bold text-gray-900 mt-1 focus:outline-none" tabIndex="-1">
+        {/* Header */}
+        <div className="border-b border-gray-100 pb-6 space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-semibold border border-teal-200">
+              <FileText className="w-3.5 h-3.5 text-teal-600" />
+              {t('viewChecklist')}
+            </span>
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-200">
+              <MapPin className="w-3 h-3 text-blue-600" />
+              {scheme.state}
+            </span>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
             {schemeName}
           </h1>
-        </header>
 
-        <div 
-          className="bg-teal-50 border border-teal-200 rounded-2xl p-4 space-y-2"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          <div className="flex items-center justify-between text-xs font-bold text-teal-950">
-            <span className="flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-amber-500" aria-hidden="true" />
-              {t('checklistProgress')}: {collectedCount} of {total} collected ({progressPercent}%)
-            </span>
-            {collectedCount === total && total > 0 && (
-              <span className="text-emerald-700 font-extrabold flex items-center gap-1">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" aria-hidden="true" />
-                {t('checklistCompleted')}
-              </span>
-            )}
-          </div>
-
-          <div className="w-full bg-teal-200/70 h-2.5 rounded-full overflow-hidden" aria-hidden="true">
-            <div
-              className="bg-teal-700 h-full transition-all duration-300 rounded-full contrast-more:bg-black"
-              style={{ width: `${progressPercent}%` }}
-            ></div>
-          </div>
+          <p className="text-xs text-gray-500">
+            Track certificate readiness for smooth MeeSeva / e-District application.
+          </p>
         </div>
 
-        <fieldset className="space-y-3 pt-2">
-          <legend className="sr-only">Required Documents for {schemeName}</legend>
-          {scheme.required_documents.map(doc => {
-            const docName = doc.translations?.[language]?.name || doc.translations?.en?.name;
-            const helper = doc.translations?.[language]?.helper || doc.translations?.en?.helper;
-            const isChecked = collectedKeys.includes(doc.key_name);
-            const checkboxId = `doc-${doc.key_name}`;
+        {/* Progress Bar */}
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center justify-between text-xs font-bold text-gray-900">
+            <span>{t('checklistProgress')}: {collectedCount} of {totalCount} collected</span>
+            <span className="text-teal-700">{progressPct}%</span>
+          </div>
+
+          <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-teal-600 to-emerald-500 transition-all duration-300 rounded-full"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+
+          {progressPct === 100 && (
+            <p className="text-xs font-bold text-emerald-700 flex items-center gap-1.5 pt-1">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              {t('checklistCompleted')}
+            </p>
+          )}
+        </div>
+
+        {/* Document Items */}
+        <div className="space-y-4">
+          {docs.map((doc) => {
+            const isChecked = collectedKeys.includes(doc.key);
+            const docName = doc[`name_${language}`] || doc.name_hi || doc.name_en;
+            const helper = doc[`helper_text_${language}`] || doc.helper_text_hi || doc.helper_text_en;
 
             return (
               <div
-                key={doc.key_name}
-                className={`p-4 rounded-2xl border transition-all flex items-start gap-4 ${
+                key={doc.key}
+                onClick={() => toggleCheck(doc.key)}
+                className={`p-5 rounded-2xl border cursor-pointer transition-all flex items-start gap-4 ${
                   isChecked
-                    ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950'
-                    : 'bg-white border-gray-200'
+                    ? 'bg-emerald-50/50 border-emerald-300 shadow-2xs'
+                    : 'bg-white border-gray-200 hover:border-teal-300'
                 }`}
               >
                 <input
                   type="checkbox"
-                  id={checkboxId}
                   checked={isChecked}
-                  onChange={() => toggleCheck(doc.key_name)}
-                  className="w-5 h-5 text-teal-700 border-gray-400 rounded focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-500 mt-0.5 cursor-pointer contrast-more:border-black"
+                  onChange={() => {}}
+                  className="w-5 h-5 text-teal-700 border-gray-300 rounded focus:ring-teal-600 mt-0.5"
                 />
-                <label htmlFor={checkboxId} className="flex-1 space-y-1 cursor-pointer">
-                  <p className={`text-sm font-bold ${isChecked ? 'line-through text-emerald-800' : 'text-gray-900'}`}>
-                    {docName}
-                  </p>
-                  {helper && (
-                    <p className="text-xs text-gray-500 contrast-more:text-black">{helper}</p>
-                  )}
-                  {doc.issuing_authority && (
-                    <span className="inline-block text-[10px] font-mono bg-gray-100 text-gray-700 px-2 py-0.5 rounded mt-1">
-                      Issuing Authority: {doc.issuing_authority}
+
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-semibold text-teal-700 uppercase bg-teal-100/60 px-2 py-0.5 rounded-md">
+                      {doc.issuing_authority}
                     </span>
-                  )}
-                </label>
+                    {isChecked && (
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
+                        Ready
+                      </span>
+                    )}
+                  </div>
+
+                  <h3 className={`text-sm font-bold ${isChecked ? 'text-emerald-950 line-through' : 'text-gray-900'}`}>
+                    {docName}
+                  </h3>
+
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    {helper}
+                  </p>
+                </div>
               </div>
             );
           })}
-        </fieldset>
-
-        <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-          <span className="text-xs text-gray-500">
-            When ready, apply on the official government website.
-          </span>
-          <a
-            href={scheme.official_link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-5 py-2.5 rounded-xl bg-teal-700 text-white text-xs font-bold shadow hover:bg-teal-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-500 transition-all contrast-more:bg-black contrast-more:text-yellow-400"
-          >
-            {t('officialLinkBtn')}
-          </a>
         </div>
 
       </div>
+
     </div>
   );
 }
